@@ -40,6 +40,7 @@ export interface Defender {
   state: "patrol" | "chase" | "returned";
   patrolDir: 1 | -1;
   patrolRange: number;
+  tackleCelebrateTimer?: number; // Jude Bellingham open arms pose timer
 }
 
 export interface Goalkeeper {

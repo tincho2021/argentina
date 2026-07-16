@@ -87,6 +87,18 @@ const MAGIC_COMMENTS = [
   "¡Fútbol de otro planeta!"
 ];
 
+const getTerrainType = (x: number, y: number) => {
+  const dxWest = x - 600;
+  const dyWest = y - 315;
+  const onWestIsland = (dxWest * dxWest) / (520 * 520) + (dyWest * dyWest) / (205 * 205) <= 1;
+  
+  const dxEast = x - 1800;
+  const dyEast = y - 315;
+  const onEastIsland = (dxEast * dxEast) / (510 * 510) + (dyEast * dyEast) / (205 * 205) <= 1;
+  
+  return (onWestIsland || onEastIsland) ? "land" : "water";
+};
+
 export default function App() {
   const [gameState, setGameState] = useState<"start" | "playing" | "celebrating" | "gameover">("start");
   const [isMuted, setIsMuted] = useState<boolean>(false);
@@ -584,10 +596,12 @@ export default function App() {
         ay *= 0.707;
       }
 
-      // Calculate speed
+      // Calculate speed with water resistance
+      const isWater = getTerrainType(p.x, p.y) === "water";
       let currentSpeed = p.speed;
       if (p.isMagicActive) currentSpeed *= 1.6; // Speed boost!
       if (p.isDribbling) currentSpeed *= 1.3; // Slight surge during dribble
+      if (isWater) currentSpeed *= 0.76; // Water drag
 
       p.vx = ax * currentSpeed;
       p.vy = ay * currentSpeed;
@@ -604,18 +618,31 @@ export default function App() {
       if (p.vx > 0) p.facing = "right";
       else if (p.vx < 0) p.facing = "left";
 
-      // Spawn dust trails if moving fast on grass
-      if ((p.vx !== 0 || p.vy !== 0) && Math.random() < 0.25) {
-        particlesRef.current.push({
-          x: p.x - (p.facing === "right" ? 15 : -15),
-          y: p.y + 20,
-          vx: -p.vx * 0.2 + (Math.random() - 0.5) * 1,
-          vy: (Math.random() - 0.5) * 1,
-          color: "rgba(255, 255, 255, 0.25)",
-          size: Math.random() * 4 + 2,
-          alpha: 0.6,
-          decay: 0.05
-        });
+      // Spawn dust trails or water splashes
+      if ((p.vx !== 0 || p.vy !== 0) && Math.random() < 0.28) {
+        if (isWater) {
+          particlesRef.current.push({
+            x: p.x - (p.facing === "right" ? 10 : -10),
+            y: p.y + 12 + (Math.random() - 0.5) * 4,
+            vx: -p.vx * 0.15 + (Math.random() - 0.5) * 2,
+            vy: -1.5 - Math.random() * 2,
+            color: "rgba(186, 230, 253, 0.8)", // light blue water splash
+            size: Math.random() * 5 + 2.2,
+            alpha: 0.85,
+            decay: 0.05
+          });
+        } else {
+          particlesRef.current.push({
+            x: p.x - (p.facing === "right" ? 15 : -15),
+            y: p.y + 20,
+            vx: -p.vx * 0.2 + (Math.random() - 0.5) * 1,
+            vy: (Math.random() - 0.5) * 1,
+            color: "rgba(255, 255, 255, 0.25)",
+            size: Math.random() * 4 + 2,
+            alpha: 0.6,
+            decay: 0.05
+          });
+        }
       }
     }
 
@@ -668,9 +695,30 @@ export default function App() {
       b.y += b.vy;
       b.angle += (b.vx / 10);
 
-      // Grass Friction
-      b.vx *= 0.975;
-      b.vy *= 0.975;
+      // Check ball terrain
+      const isBallWater = getTerrainType(b.x, b.y) === "water";
+
+      // Friction
+      if (isBallWater && b.height < 15) {
+        b.vx *= 0.94; // water slows down the rolling ball
+        b.vy *= 0.94;
+
+        if (Math.hypot(b.vx, b.vy) > 1 && Math.random() < 0.3) {
+          particlesRef.current.push({
+            x: b.x + (Math.random() - 0.5) * 6,
+            y: b.y + (Math.random() - 0.5) * 4,
+            vx: (Math.random() - 0.5) * 1.5,
+            vy: -0.6 - Math.random() * 1.5,
+            color: "rgba(224, 242, 254, 0.75)",
+            size: Math.random() * 4.5 + 1.5,
+            alpha: 0.75,
+            decay: 0.06
+          });
+        }
+      } else {
+        b.vx *= 0.975;
+        b.vy *= 0.975;
+      }
 
       // 3D Ball Altitude arc
       if (b.height > 0 || b.vHeight !== 0) {
@@ -798,33 +846,57 @@ export default function App() {
     defendersRef.current.forEach((def) => {
       const distToPlayer = Math.hypot(p.x - def.x, p.y - def.y);
       const isOpponentLent = p.isMagicActive;
-      const currentSpeed = isOpponentLent ? def.speed * 0.45 : def.speed;
 
-      // Decision State
-      if (p.stunTimer <= 0 && distToPlayer < 320) {
-        def.state = "chase";
-      } else {
-        def.state = "patrol";
-      }
-
-      // Movement behavior
-      if (def.state === "chase") {
-        const angle = Math.atan2(p.y - def.y, p.x - def.x);
-        def.vx = Math.cos(angle) * currentSpeed;
-        def.vy = Math.sin(angle) * currentSpeed;
-      } else {
-        // Patrol up/down in their defense lines
+      // Bellingham tackle celebration countdown
+      if (def.tackleCelebrateTimer && def.tackleCelebrateTimer > 0) {
+        def.tackleCelebrateTimer -= dt;
         def.vx = 0;
-        def.vy = def.patrolDir * (currentSpeed * 0.8);
-        
-        // Boundaries
-        if (def.y < TOP_LINE + 20) {
-          def.y = TOP_LINE + 20;
-          def.patrolDir = 1;
+        def.vy = 0;
+
+        // Spawn gold stars/sparkles over Bellingham celebrating
+        if (Math.random() < 0.15) {
+          particlesRef.current.push({
+            x: def.x + (Math.random() - 0.5) * 20,
+            y: def.y - def.height - 10,
+            vx: (Math.random() - 0.5) * 1,
+            vy: -1 - Math.random() * 1.5,
+            color: "#fbbf24", // Gold stars
+            size: Math.random() * 3 + 1.5,
+            alpha: 0.9,
+            decay: 0.05
+          });
         }
-        if (def.y > BOTTOM_LINE - 20) {
-          def.y = BOTTOM_LINE - 20;
-          def.patrolDir = -1;
+      } else {
+        const isDefWater = getTerrainType(def.x, def.y) === "water";
+        let currentSpeed = isOpponentLent ? def.speed * 0.45 : def.speed;
+        if (isDefWater) currentSpeed *= 0.78; // slow down in water!
+
+        // Decision State
+        if (p.stunTimer <= 0 && distToPlayer < 320) {
+          def.state = "chase";
+        } else {
+          def.state = "patrol";
+        }
+
+        // Movement behavior
+        if (def.state === "chase") {
+          const angle = Math.atan2(p.y - def.y, p.x - def.x);
+          def.vx = Math.cos(angle) * currentSpeed;
+          def.vy = Math.sin(angle) * currentSpeed;
+        } else {
+          // Patrol up/down in their defense lines
+          def.vx = 0;
+          def.vy = def.patrolDir * (currentSpeed * 0.8);
+          
+          // Boundaries
+          if (def.y < TOP_LINE + 20) {
+            def.y = TOP_LINE + 20;
+            def.patrolDir = 1;
+          }
+          if (def.y > BOTTOM_LINE - 20) {
+            def.y = BOTTOM_LINE - 20;
+            def.patrolDir = -1;
+          }
         }
       }
 
@@ -839,6 +911,11 @@ export default function App() {
       if (distToPlayer < 30 && p.stunTimer <= 0 && p.invincibilityTime <= 0 && !p.isDribbling) {
         p.energy = Math.max(0, p.energy - 20);
         sound.playTackled();
+
+        // Trigger Jude Bellingham open arms pose!
+        def.tackleCelebrateTimer = 1.6;
+        def.vx = 0;
+        def.vy = 0;
 
         // Bounce back effect
         const angle = Math.atan2(p.y - def.y, p.x - def.x);
@@ -1093,59 +1170,294 @@ export default function App() {
     }
   };
 
+  // Falkland/Malvinas Islands Path Helpers
+  const drawWestFalklandPath = (c: CanvasRenderingContext2D, cX: number, scaleOffset = 0) => {
+    c.beginPath();
+    c.moveTo(80 - cX - scaleOffset, 240 - scaleOffset);
+    c.bezierCurveTo(150 - cX, 120 - scaleOffset, 450 - cX, 90 - scaleOffset, 650 - cX, 130 - scaleOffset); // North coast
+    c.bezierCurveTo(750 - cX, 150, 900 - cX, 120, 1000 - cX + scaleOffset, 180 - scaleOffset); // Indentation
+    c.bezierCurveTo(1100 - cX + scaleOffset, 220, 1120 - cX + scaleOffset, 320, 1080 - cX + scaleOffset, 420 + scaleOffset); // East coast
+    c.bezierCurveTo(1000 - cX, 480, 850 - cX, 530 + scaleOffset, 650 - cX, 520 + scaleOffset); // South-east coast
+    c.bezierCurveTo(450 - cX, 510, 250 - cX, 540 + scaleOffset, 150 - cX - scaleOffset, 480 + scaleOffset); // Southwest
+    c.bezierCurveTo(70 - cX - scaleOffset, 440, 50 - cX - scaleOffset, 320, 80 - cX - scaleOffset, 240 - scaleOffset);
+    c.closePath();
+  };
+
+  const drawEastFalklandPath = (c: CanvasRenderingContext2D, cX: number, scaleOffset = 0) => {
+    c.beginPath();
+    c.moveTo(1320 - cX - scaleOffset, 180 - scaleOffset);
+    c.bezierCurveTo(1450 - cX, 110 - scaleOffset, 1850 - cX, 100 - scaleOffset, 2150 - cX + scaleOffset, 140 - scaleOffset); // North coast
+    c.bezierCurveTo(2280 - cX + scaleOffset, 160, 2350 - cX + scaleOffset, 250, 2320 - cX + scaleOffset, 350 + scaleOffset); // East coast
+    c.bezierCurveTo(2250 - cX + scaleOffset, 420, 2050 - cX + scaleOffset, 440, 1950 - cX + scaleOffset, 420 + scaleOffset); // Southeast
+    c.bezierCurveTo(1850 - cX, 460, 1850 - cX, 540 + scaleOffset, 1750 - cX, 530 + scaleOffset); // Lafonia southern bulge
+    c.bezierCurveTo(1600 - cX, 520, 1550 - cX, 480, 1520 - cX, 390); // Isthmus indent near Goose Green
+    c.bezierCurveTo(1480 - cX, 370, 1400 - cX, 390, 1340 - cX - scaleOffset, 440 + scaleOffset); // Southwest
+    c.bezierCurveTo(1260 - cX - scaleOffset, 320, 1260 - cX - scaleOffset, 240, 1320 - cX - scaleOffset, 180 - scaleOffset);
+    c.closePath();
+  };
+
   const drawPitch = (ctx: CanvasRenderingContext2D, cameraX: number) => {
-    // Alternating lawn green stripes
-    const stripeWidth = 100;
-    const startStripe = Math.floor(cameraX / stripeWidth);
-    const endStripe = Math.ceil((cameraX + CANVAS_WIDTH) / stripeWidth);
+    // 1. Draw Deep Blue Ocean Background
+    const oceanGrad = ctx.createLinearGradient(0, TOP_LINE, 0, CANVAS_HEIGHT);
+    oceanGrad.addColorStop(0, "#0284c7"); // beautiful deep sky-blue ocean
+    oceanGrad.addColorStop(1, "#0369a1");
+    ctx.fillStyle = oceanGrad;
+    ctx.fillRect(0, TOP_LINE, CANVAS_WIDTH, FIELD_HEIGHT - TOP_LINE);
 
-    for (let s = startStripe; s <= endStripe; s++) {
-      ctx.fillStyle = s % 2 === 0 ? "#14532d" : "#15803d"; // alternate dark and medium green
-      const rx = s * stripeWidth - cameraX;
-      ctx.fillRect(rx, TOP_LINE + 5, stripeWidth, FIELD_HEIGHT - TOP_LINE - 5);
-    }
-
-    // Pitch touchline (White bounds)
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
-    ctx.lineWidth = 4;
-    
-    // Top & Bottom boundary bounds
-    ctx.beginPath();
-    ctx.moveTo(0 - cameraX, TOP_LINE + 5);
-    ctx.lineTo(FIELD_WIDTH - cameraX, TOP_LINE + 5);
-    ctx.moveTo(0 - cameraX, BOTTOM_LINE + 5);
-    ctx.lineTo(FIELD_WIDTH - cameraX, BOTTOM_LINE + 5);
-    
-    // Left & Right bounds
-    ctx.moveTo(40 - cameraX, TOP_LINE + 5);
-    ctx.lineTo(40 - cameraX, BOTTOM_LINE + 5);
-    ctx.moveTo(FIELD_WIDTH - 60 - cameraX, TOP_LINE + 5);
-    ctx.lineTo(FIELD_WIDTH - 60 - cameraX, BOTTOM_LINE + 5);
-    ctx.stroke();
-
-    // Center circle & line (Only if visible on camera)
-    const midX = FIELD_WIDTH / 2 - cameraX;
-    if (midX > -150 && midX < CANVAS_WIDTH + 150) {
+    // Scrolling ocean waves
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+    ctx.lineWidth = 2;
+    const waveSpacing = 60;
+    const waveOffset = (runCycleRef.current * 1.5) % waveSpacing;
+    for (let y = TOP_LINE + 10; y < BOTTOM_LINE + 50; y += waveSpacing) {
       ctx.beginPath();
-      ctx.arc(midX, 310, 80, 0, Math.PI * 2);
-      ctx.moveTo(midX, TOP_LINE + 5);
-      ctx.lineTo(midX, BOTTOM_LINE + 5);
+      for (let x = 0; x < CANVAS_WIDTH + 40; x += 40) {
+        const waveY = y + Math.sin((x + cameraX) * 0.01 + runCycleRef.current * 0.25) * 5 - waveOffset;
+        if (x === 0) ctx.moveTo(x, waveY);
+        else ctx.lineTo(x, waveY);
+      }
       ctx.stroke();
     }
 
-    // Penalty area (Rival side on right)
-    const penAreaX = GOAL_X - 250 - cameraX;
-    ctx.beginPath();
-    ctx.rect(penAreaX, 170, 250, 280);
-    ctx.stroke();
+    // 2. Draw Falkland Sound Shallow Water (Turquoise Strait of San Carlos)
+    // Centered horizontally around 1200
+    const soundLeft = 1110 - cameraX;
+    const soundRight = 1290 - cameraX;
+    if (soundRight > 0 && soundLeft < CANVAS_WIDTH) {
+      const shallowGrad = ctx.createLinearGradient(soundLeft, 0, soundRight, 0);
+      shallowGrad.addColorStop(0, "rgba(56, 189, 248, 0.15)");
+      shallowGrad.addColorStop(0.3, "rgba(56, 189, 248, 0.45)"); // shallower at center sandbar
+      shallowGrad.addColorStop(0.7, "rgba(56, 189, 248, 0.45)");
+      shallowGrad.addColorStop(1, "rgba(56, 189, 248, 0.15)");
+      ctx.fillStyle = shallowGrad;
+      ctx.fillRect(soundLeft, TOP_LINE, 180, FIELD_HEIGHT - TOP_LINE);
 
-    // Penalty Spot
-    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-    ctx.beginPath();
-    ctx.arc(GOAL_X - 110 - cameraX, 310, 5, 0, Math.PI * 2);
+      // Shallow sand ripples
+      ctx.strokeStyle = "rgba(253, 224, 71, 0.12)";
+      ctx.lineWidth = 1.5;
+      for (let ry = TOP_LINE + 15; ry < BOTTOM_LINE + 40; ry += 35) {
+        ctx.beginPath();
+        ctx.arc(soundLeft + 90, ry, 60, Math.PI * 0.8, Math.PI * 1.2);
+        ctx.stroke();
+      }
+    }
+
+    // 3. Draw Sandy Beach Outline for both islands (rendered slightly larger)
+    ctx.fillStyle = "#fde047"; // Warm golden sand
+    drawWestFalklandPath(ctx, cameraX, 9);
+    ctx.fill();
+    drawEastFalklandPath(ctx, cameraX, 9);
     ctx.fill();
 
-    // Draw Rival Goal Frame and netting
+    // 4. Draw Grassy Surface (the interior of the islands) with turf stripes
+    // West Falkland interior
+    ctx.save();
+    drawWestFalklandPath(ctx, cameraX, 0);
+    ctx.clip();
+    const stripeWidth = 80;
+    const startStripe = Math.floor(cameraX / stripeWidth);
+    const endStripe = Math.ceil((cameraX + CANVAS_WIDTH) / stripeWidth);
+    for (let s = startStripe; s <= endStripe; s++) {
+      ctx.fillStyle = s % 2 === 0 ? "#15803d" : "#166534"; // rich lawn greens
+      const rx = s * stripeWidth - cameraX;
+      ctx.fillRect(rx, 0, stripeWidth, CANVAS_HEIGHT);
+    }
+    ctx.restore();
+
+    // East Falkland interior
+    ctx.save();
+    drawEastFalklandPath(ctx, cameraX, 0);
+    ctx.clip();
+    for (let s = startStripe; s <= endStripe; s++) {
+      ctx.fillStyle = s % 2 === 0 ? "#15803d" : "#166534";
+      const rx = s * stripeWidth - cameraX;
+      ctx.fillRect(rx, 0, stripeWidth, CANVAS_HEIGHT);
+    }
+    ctx.restore();
+
+    // 5. White Chalk Boundary Outline following the coastlines
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.65)";
+    ctx.lineWidth = 3.5;
+    
+    ctx.save();
+    drawWestFalklandPath(ctx, cameraX, 0);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    drawEastFalklandPath(ctx, cameraX, 0);
+    ctx.stroke();
+    ctx.restore();
+
+    // 6. Traditional Soccer Chalk markings (semi-transparent overlays)
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+    ctx.lineWidth = 3;
+
+    // Center circle & Center line (crossing the Sound playfully!)
+    const midX = FIELD_WIDTH / 2 - cameraX;
+    if (midX > -150 && midX < CANVAS_WIDTH + 150) {
+      ctx.beginPath();
+      ctx.arc(midX, 315, 75, 0, Math.PI * 2);
+      ctx.moveTo(midX, TOP_LINE + 10);
+      ctx.lineTo(midX, BOTTOM_LINE - 10);
+      ctx.stroke();
+    }
+
+    // Penalty area (on right island / East Falkland)
+    const penAreaLeft = 2050 - cameraX;
+    if (penAreaLeft < CANVAS_WIDTH) {
+      ctx.beginPath();
+      ctx.rect(penAreaLeft, 180, 250, 270);
+      ctx.stroke();
+
+      // Penalty Spot
+      ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+      ctx.beginPath();
+      ctx.arc(GOAL_X - 110 - cameraX, 315, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 7. Draw Rustic Wooden Bridge crossing the Sound
+    // Connects West & East Falkland in the center (around y = 265 to 365)
+    if (soundRight > 0 && soundLeft < CANVAS_WIDTH) {
+      const bridgeY = 265;
+      const bridgeH = 100;
+
+      // Under support poles
+      ctx.fillStyle = "#451a03"; // dark wood
+      ctx.fillRect(soundLeft + 30, bridgeY - 5, 8, bridgeH + 15);
+      ctx.fillRect(soundRight - 38, bridgeY - 5, 8, bridgeH + 15);
+
+      // Main bridge deck (draw planks)
+      const plankW = 10;
+      for (let px = soundLeft + 4; px <= soundRight - 4; px += plankW + 2) {
+        ctx.fillStyle = (Math.floor(px) % 3 === 0) ? "#7c2d12" : "#9a3412"; // warm timber wood
+        ctx.fillRect(px, bridgeY, plankW, bridgeH);
+        // lines between planks
+        ctx.fillStyle = "#451a03";
+        ctx.fillRect(px + plankW, bridgeY, 2, bridgeH);
+      }
+
+      // Handrails / Ropes
+      ctx.strokeStyle = "#451a03";
+      ctx.lineWidth = 4;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(soundLeft, bridgeY + 3);
+      ctx.lineTo(soundRight, bridgeY + 3);
+      ctx.moveTo(soundLeft, bridgeY + bridgeH - 3);
+      ctx.lineTo(soundRight, bridgeY + bridgeH - 3);
+      ctx.stroke();
+
+      // Rail rope details (vertical ties)
+      ctx.strokeStyle = "#ea580c";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      for (let px = soundLeft + 15; px <= soundRight - 15; px += 30) {
+        ctx.moveTo(px, bridgeY);
+        ctx.lineTo(px, bridgeY + 8);
+        ctx.moveTo(px, bridgeY + bridgeH);
+        ctx.lineTo(px, bridgeY + bridgeH - 8);
+      }
+      ctx.stroke();
+    }
+
+    // 8. Draw Cute Animated Cartoon Penguin standing on a Rock in the Sound
+    if (soundRight > 0 && soundLeft < CANVAS_WIDTH) {
+      const px = 1200 - cameraX;
+      const py = 160;
+
+      // Draw rock
+      ctx.fillStyle = "#64748b";
+      ctx.beginPath();
+      ctx.ellipse(px, py + 8, 15, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#475569";
+      ctx.beginPath();
+      ctx.ellipse(px - 3, py + 5, 9, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Draw little penguin
+      ctx.save();
+      ctx.translate(px, py);
+      
+      // Idle bounce
+      const bounce = Math.abs(Math.sin(runCycleRef.current * 0.15)) * 2.2;
+      ctx.translate(0, -bounce);
+
+      // penguin body
+      ctx.fillStyle = "#0f172a"; // dark grey/black body
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 8.5, 11, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // white belly
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.ellipse(0, 2, 5.2, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // yellow feet
+      ctx.fillStyle = "#ea580c";
+      ctx.beginPath();
+      ctx.ellipse(-4, 11, 3.5, 2, 0, 0, Math.PI * 2);
+      ctx.ellipse(4, 11, 3.5, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Flippers
+      ctx.fillStyle = "#0f172a";
+      ctx.save();
+      // Wave flippers if celebrated
+      if (gameState === "celebrating") {
+        ctx.rotate(Math.sin(runCycleRef.current * 0.8) * 0.5);
+      }
+      ctx.fillRect(-11, -3, 3, 7);
+      ctx.restore();
+
+      ctx.save();
+      if (gameState === "celebrating") {
+        ctx.rotate(-Math.sin(runCycleRef.current * 0.8) * 0.5);
+      }
+      ctx.fillRect(8, -3, 3, 7);
+      ctx.restore();
+
+      // head angle tracking the ball!
+      const ball = ballRef.current;
+      const angleToBall = Math.atan2(ball.y - py, (ball.x - 1200));
+      ctx.translate(0, -9);
+      ctx.rotate(angleToBall * 0.35); // turn head slightly to follow ball!
+
+      // head base
+      ctx.fillStyle = "#0f172a";
+      ctx.beginPath();
+      ctx.arc(0, 0, 6.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // eyes
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(-2, -1, 1.9, 0, Math.PI * 2);
+      ctx.arc(2, -1, 1.9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#000000";
+      ctx.beginPath();
+      ctx.arc(-2, -1, 0.9, 0, Math.PI * 2);
+      ctx.arc(2, -1, 0.9, 0, Math.PI * 2);
+      ctx.fill();
+
+      // beak
+      ctx.fillStyle = "#f59e0b";
+      ctx.beginPath();
+      ctx.moveTo(0, -0.5);
+      ctx.lineTo(4.5, 1);
+      ctx.lineTo(0, 2.5);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // 9. Draw Rival Goal Frame and netting
     const rx = GOAL_X - cameraX;
     // Goal post shadow
     ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
@@ -1280,10 +1592,18 @@ export default function App() {
     ctx.fillStyle = "#111827";
     ctx.fillRect(tx, ty + torsoH - 5, torsoW, 6);
 
-    // Arm details
+    // Arm details with Captain Armband
     ctx.fillStyle = "#7dd3fc";
-    const armX = p.facing === "right" ? rx - 14 : rx + 10;
+    const armX = p.facing === "right" ? rx - 13 : rx + 9;
     ctx.fillRect(armX, ty + 2, 4, 12);
+    
+    // Captain armband
+    ctx.fillStyle = "#fef08a"; // gold yellow
+    ctx.fillRect(armX, ty + 5, 4, 4);
+    ctx.fillStyle = "#111827";
+    ctx.font = "bold 5px sans-serif";
+    ctx.fillText("C", armX + 0.5, ty + 9);
+
     ctx.fillStyle = "#fbcfe8"; // skin hand
     ctx.fillRect(armX, ty + 14, 4, 4);
 
@@ -1342,11 +1662,13 @@ export default function App() {
       const rx = def.x - cameraX;
       const ry = def.y;
 
-      if (rx < -50 || rx > CANVAS_WIDTH + 50) return;
+      if (rx < -80 || rx > CANVAS_WIDTH + 80) return;
 
-      // Animated run
-      const leftLegOffset = Math.sin(runCycleRef.current * 0.9 + def.id) * 15;
-      const rightLegOffset = -Math.sin(runCycleRef.current * 0.9 + def.id) * 15;
+      const isCelebrating = def.tackleCelebrateTimer && def.tackleCelebrateTimer > 0;
+
+      // Animated run limb offsets (only if not celebrating)
+      const leftLegOffset = isCelebrating ? 0 : Math.sin(runCycleRef.current * 0.9 + def.id) * 15;
+      const rightLegOffset = isCelebrating ? 0 : -Math.sin(runCycleRef.current * 0.9 + def.id) * 15;
 
       // Shadow
       ctx.fillStyle = "rgba(0,0,0,0.25)";
@@ -1367,68 +1689,110 @@ export default function App() {
       ctx.lineTo(rx + 5 + rightLegOffset * 0.4, ry + 15);
       ctx.stroke();
 
-      // Red English Shoes
-      ctx.fillStyle = "#ef4444";
+      // English Blue/Red Shoes
+      ctx.fillStyle = "#1e3a8a"; // Navy boots
       ctx.beginPath();
       ctx.arc(rx - 9 + leftLegOffset * 0.4 + 2, ry + 15, 4.5, 0, Math.PI * 2);
       ctx.arc(rx + 5 + rightLegOffset * 0.4 + 2, ry + 15, 4.5, 0, Math.PI * 2);
       ctx.fill();
 
-      // Torso (Camiseta Inglesa Blanca con detalles Rojos)
-      const torsoW = 28; // Broader
-      const torsoH = 32;
+      // Torso (White English Jersey with Red side stripes, Number 5 print)
+      const torsoW = 26; // athletic bellingham torso
+      const torsoH = 34;
       const tx = rx - torsoW / 2;
       const ty = ry - torsoH;
 
       ctx.fillStyle = "#ffffff"; // English white jersey
       ctx.fillRect(tx, ty, torsoW, torsoH);
 
-      // Red collar and shoulder stripes
+      // Red sleeve collar details
       ctx.fillStyle = "#ef4444";
-      ctx.fillRect(tx, ty, torsoW, 4); // collar line
-      ctx.fillRect(tx, ty, 3, torsoH - 8); // side stripe
-      ctx.fillRect(tx + torsoW - 3, ty, 3, torsoH - 8);
+      ctx.fillRect(tx, ty, torsoW, 3); // collar
+      ctx.fillRect(tx, ty, 3, torsoH - 8); // left side stripe
+      ctx.fillRect(tx + torsoW - 3, ty, 3, torsoH - 8); // right side stripe
 
       // Dark Blue Shorts
       ctx.fillStyle = "#1e3a8a";
       ctx.fillRect(tx, ty + torsoH - 6, torsoW, 7);
 
-      // Arm Details
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(rx - 17, ty + 2, 4, 14);
-      ctx.fillStyle = "#fed7aa"; // Skin hand
-      ctx.fillRect(rx - 17, ty + 16, 4, 4);
+      // Print Bellingham's iconic Number 5!
+      ctx.fillStyle = "#0f172a"; // navy blue print
+      ctx.font = "bold 13px sans-serif";
+      ctx.fillText("5", rx - 4, ty + 16);
 
-      // Head
-      const headRadius = 14;
+      // Arm Details
+      if (isCelebrating) {
+        // Bellingham Outstretched Open Arms Celebration!
+        ctx.fillStyle = "#b45309"; // skin hands
+        ctx.fillRect(rx - 25, ty + 8, 12, 5); // left hand outstretched
+        ctx.fillRect(rx + 13, ty + 8, 12, 5); // right hand outstretched
+      } else {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(rx - 16, ty + 2, 4, 14);
+        ctx.fillStyle = "#b45309"; // Skin hand
+        ctx.fillRect(rx - 16, ty + 16, 4, 4);
+      }
+
+      // Head (Jude Bellingham Caricature)
+      const headRadius = 13.5;
       const hx = rx;
       const hy = ry - torsoH - headRadius + 4;
 
-      // Skin
-      ctx.fillStyle = "#fed7aa";
+      // Skin (caramel tan complexion)
+      ctx.fillStyle = "#b45309";
       ctx.beginPath();
-      ctx.arc(hx, hy, headRadius - 1.5, 0, Math.PI * 2);
+      ctx.arc(hx, hy, headRadius - 1, 0, Math.PI * 2);
       ctx.fill();
 
-      // Blond or Brown hair
-      ctx.fillStyle = def.id % 2 === 0 ? "#eab308" : "#78350f";
+      // Neat black fade buzz-cut hair cap
+      ctx.fillStyle = "#1c1917";
       ctx.beginPath();
       ctx.arc(hx, hy - 4, headRadius - 0.5, Math.PI, 0);
       ctx.fill();
+      // Side hair trim details
+      ctx.fillRect(hx - 13, hy - 4, 3, 6);
+      ctx.fillRect(hx + 10, hy - 4, 3, 6);
 
-      // Focused/angry game eyes
-      ctx.fillStyle = "#000000";
-      ctx.beginPath();
-      ctx.arc(hx - 4, hy - 2, 2, 0, Math.PI * 2);
-      ctx.arc(hx + 4, hy - 2, 2, 0, Math.PI * 2);
-      ctx.fill();
-      // Brows
-      ctx.strokeStyle = "#1e293b";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(hx - 7, hy - 5); ctx.lineTo(hx - 1, hy - 3);
-      ctx.moveTo(hx + 7, hy - 5); ctx.lineTo(hx + 1, hy - 3);
-      ctx.stroke();
+      // Facial expressions
+      if (isCelebrating) {
+        // Smug closed-eyes smiling face
+        ctx.strokeStyle = "#1e293b";
+        ctx.lineWidth = 1.5;
+        // Closed smiling eyes
+        ctx.beginPath();
+        ctx.arc(hx - 4, hy - 1, 2, Math.PI, 0);
+        ctx.arc(hx + 4, hy - 1, 2, Math.PI, 0);
+        ctx.stroke();
+
+        // Happy smug smile mouth
+        ctx.beginPath();
+        ctx.arc(hx, hy + 4, 4, 0, Math.PI);
+        ctx.stroke();
+
+        // Tiny crown or halo over Bellingham celebrating
+        ctx.fillStyle = "#f59e0b";
+        ctx.font = "11px sans-serif";
+        ctx.fillText("👑", hx - 6, hy - 19);
+      } else {
+        // Focused game face
+        ctx.fillStyle = "#000000";
+        ctx.beginPath();
+        ctx.arc(hx - 4, hy - 2, 1.8, 0, Math.PI * 2);
+        ctx.arc(hx + 4, hy - 2, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Determined straight line mouth
+        ctx.fillStyle = "#7c2d12";
+        ctx.fillRect(hx - 3, hy + 4, 6, 2);
+
+        // Brows
+        ctx.strokeStyle = "#1e293b";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(hx - 6, hy - 5); ctx.lineTo(hx - 1, hy - 3);
+        ctx.moveTo(hx + 6, hy - 5); ctx.lineTo(hx + 1, hy - 3);
+        ctx.stroke();
+      }
     });
   };
 
