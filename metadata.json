@@ -1,0 +1,6 @@
+{
+  "name": "El 10 contra Inglaterra",
+  "description": "Un videojuego de fútbol interactivo 2D de Lionel Messi esquivando defensores ingleses para marcar goles memorables.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
