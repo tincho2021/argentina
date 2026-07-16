@@ -2415,45 +2415,45 @@ export default function App() {
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col justify-between overflow-x-hidden select-none">
       
       {/* HEADER SECTION */}
-      <header className="bg-slate-900 border-b border-slate-800 px-4 py-3 shadow-lg z-10 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-sky-500/10 border border-sky-400/30 flex items-center justify-center text-sky-400">
-            <span className="font-extrabold text-lg">10</span>
+      <header className="bg-slate-900 border-b border-slate-800 px-2 sm:px-4 py-2 sm:py-3 shadow-lg z-10 flex items-center justify-between gap-1.5 sm:gap-4">
+        <div className="flex items-center gap-1.5 sm:gap-3">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-sky-500/10 border border-sky-400/30 flex items-center justify-center text-sky-400 flex-shrink-0">
+            <span className="font-extrabold text-sm sm:text-lg">10</span>
           </div>
           <div>
-            <h1 className="text-xl font-black tracking-tight text-white flex items-center gap-2">
+            <h1 className="text-xs sm:text-xl font-black tracking-tight text-white flex items-center gap-1">
               EL 10 <span className="text-sky-400">CONTRA INGLATERRA</span>
             </h1>
-            <p className="text-xs text-slate-400 font-mono">Dribble & Goal 2D Cartoon Arcade</p>
+            <p className="text-[9px] sm:text-xs text-slate-400 font-mono">Dribble & Goal 2D Cartoon Arcade</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
           {/* High score badge */}
-          <div className="bg-slate-950 border border-amber-500/20 px-3 py-1.5 rounded-lg flex items-center gap-2">
-            <Trophy className="w-4 h-4 text-amber-500 animate-pulse" />
+          <div className="bg-slate-950 border border-amber-500/20 px-1.5 sm:px-3 py-1 sm:py-1.5 rounded-lg flex items-center gap-1 sm:gap-2">
+            <Trophy className="w-3.5 h-3.5 text-amber-500 animate-pulse flex-shrink-0" />
             <div className="text-left">
-              <p className="text-[10px] uppercase font-mono text-slate-400 tracking-wider">Récord Máximo</p>
-              <p className="text-sm font-black text-amber-400 font-mono">{stats.highScore} pts</p>
+              <p className="text-[8px] uppercase font-mono text-slate-400 tracking-wider leading-none mb-0.5">Récord</p>
+              <p className="text-xs sm:text-sm font-black text-amber-400 font-mono leading-none">{stats.highScore} pts</p>
             </div>
           </div>
 
           {/* Sound toggle */}
           <button
             onClick={handleToggleMute}
-            className="w-10 h-10 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
             title={isMuted ? "Activar Sonido" : "Silenciar"}
           >
-            {isMuted ? <VolumeX className="w-5 h-5 text-rose-400" /> : <Volume2 className="w-5 h-5 text-emerald-400" />}
+            {isMuted ? <VolumeX className="w-4 h-4 sm:w-5 sm:h-5 text-rose-400" /> : <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />}
           </button>
 
           {/* Help instructions button */}
           <button
             onClick={() => setShowInstructions(true)}
-            className="w-10 h-10 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
             title="Instrucciones"
           >
-            <Info className="w-5 h-5" />
+            <Info className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
       </header>
@@ -2539,11 +2539,11 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="w-full flex flex-col gap-4"
+              className="w-full flex flex-col gap-1.5 md:gap-4 h-[calc(100vh-68px)] md:h-auto justify-between"
             >
               
-              {/* GAME STATS BAR */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-900 border border-slate-800 p-3 rounded-2xl shadow-xl">
+              {/* GAME STATS BAR (Desktop only) */}
+              <div className="hidden md:grid grid-cols-4 gap-3 bg-slate-900 border border-slate-800 p-3 rounded-2xl shadow-xl">
                 
                 {/* Score */}
                 <div className="bg-slate-950 border border-slate-800 px-4 py-2 rounded-xl flex items-center gap-3">
@@ -2607,8 +2607,8 @@ export default function App() {
 
               </div>
 
-              {/* DYNAMIC PROGRESS BAR: MAGIA DEL 10 */}
-              <div className="bg-slate-900 border border-slate-800 p-3 rounded-2xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+              {/* DYNAMIC PROGRESS BAR: MAGIA DEL 10 (Desktop only) */}
+              <div className="hidden md:flex bg-slate-900 border border-slate-800 p-3 rounded-2xl shadow-xl flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-2">
                   <Zap className="w-5 h-5 text-sky-400" />
                   <div>
@@ -2658,7 +2658,7 @@ export default function App() {
               </div>
 
               {/* GAME STAGE VIEWPORT (CANVAS) */}
-              <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-[#14532d] border-4 border-slate-800 shadow-2xl flex items-center justify-center">
+              <div className="relative w-full aspect-video rounded-xl md:rounded-2xl overflow-hidden bg-[#14532d] border-2 md:border-4 border-slate-800 shadow-2xl flex items-center justify-center flex-shrink-0">
                 
                 <canvas
                   ref={canvasRef}
@@ -2680,11 +2680,11 @@ export default function App() {
                   </div>
                 )}
 
-                {/* TRANSLUCENT ARCADE VIRTUAL CONTROLLER OVERLAYS (Overlay directly on top of playfield) */}
+                {/* TRANSLUCENT ARCADE VIRTUAL CONTROLLER OVERLAYS (Desktop-only Overlay on top of playfield) */}
                 {(gameState === "playing" || gameState === "celebrating") && (
                   <>
                     {/* D-PAD overlay on the bottom-left */}
-                    <div className="absolute left-2.5 bottom-2.5 sm:left-4 sm:bottom-4 z-30 bg-slate-950/50 backdrop-blur-xs p-1 rounded-xl border border-white/10 w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center pointer-events-auto">
+                    <div className="hidden md:flex absolute left-4 bottom-4 z-30 bg-slate-950/50 backdrop-blur-xs p-1 rounded-xl border border-white/10 w-32 h-32 items-center justify-center pointer-events-auto">
                       <div className="grid grid-cols-3 gap-0.5 w-full h-full">
                         <div />
                         <button
@@ -2692,7 +2692,7 @@ export default function App() {
                           onMouseUp={() => { keysPressed.current["w"] = false; }}
                           onTouchStart={(e) => { e.preventDefault(); keysPressed.current["w"] = true; }}
                           onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["w"] = false; }}
-                          className="rounded-md bg-white/10 active:bg-sky-500/60 text-white font-black text-xs sm:text-sm border border-white/5 cursor-pointer flex items-center justify-center select-none"
+                          className="rounded-md bg-white/10 active:bg-sky-500/60 text-white font-black text-sm border border-white/5 cursor-pointer flex items-center justify-center select-none"
                         >
                           ▲
                         </button>
@@ -2703,11 +2703,11 @@ export default function App() {
                           onMouseUp={() => { keysPressed.current["a"] = false; }}
                           onTouchStart={(e) => { e.preventDefault(); keysPressed.current["a"] = true; }}
                           onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["a"] = false; }}
-                          className="rounded-md bg-white/10 active:bg-sky-500/60 text-white font-black text-xs sm:text-sm border border-white/5 cursor-pointer flex items-center justify-center select-none"
+                          className="rounded-md bg-white/10 active:bg-sky-500/60 text-white font-black text-sm border border-white/5 cursor-pointer flex items-center justify-center select-none"
                         >
                           ◀
                         </button>
-                        <div className="flex items-center justify-center text-white/20 font-mono text-[7px] sm:text-[9px] uppercase font-black tracking-tighter">
+                        <div className="flex items-center justify-center text-white/20 font-mono text-[9px] uppercase font-black tracking-tighter animate-pulse">
                           PAD
                         </div>
                         <button
@@ -2715,7 +2715,7 @@ export default function App() {
                           onMouseUp={() => { keysPressed.current["d"] = false; }}
                           onTouchStart={(e) => { e.preventDefault(); keysPressed.current["d"] = true; }}
                           onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["d"] = false; }}
-                          className="rounded-md bg-white/10 active:bg-sky-500/60 text-white font-black text-xs sm:text-sm border border-white/5 cursor-pointer flex items-center justify-center select-none"
+                          className="rounded-md bg-white/10 active:bg-sky-500/60 text-white font-black text-sm border border-white/5 cursor-pointer flex items-center justify-center select-none"
                         >
                           ▶
                         </button>
@@ -2726,7 +2726,7 @@ export default function App() {
                           onMouseUp={() => { keysPressed.current["s"] = false; }}
                           onTouchStart={(e) => { e.preventDefault(); keysPressed.current["s"] = true; }}
                           onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["s"] = false; }}
-                          className="rounded-md bg-white/10 active:bg-sky-500/60 text-white font-black text-xs sm:text-sm border border-white/5 cursor-pointer flex items-center justify-center select-none"
+                          className="rounded-md bg-white/10 active:bg-sky-500/60 text-white font-black text-sm border border-white/5 cursor-pointer flex items-center justify-center select-none"
                         >
                           ▼
                         </button>
@@ -2735,23 +2735,23 @@ export default function App() {
                     </div>
 
                     {/* Action buttons overlay on the bottom-right */}
-                    <div className="absolute right-2.5 bottom-2.5 sm:right-4 sm:bottom-4 z-30 flex gap-1.5 pointer-events-auto">
+                    <div className="hidden md:flex absolute right-4 bottom-4 z-30 gap-1.5 pointer-events-auto">
                       {/* Gambeta Action */}
                       <button
                         onClick={triggerDribble}
-                        className="h-10 w-16 sm:h-12 sm:w-24 bg-amber-500/30 hover:bg-amber-500/50 active:bg-amber-500/80 backdrop-blur-xs border border-amber-400/20 text-white rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all select-none shadow-md"
+                        className="h-12 w-24 bg-amber-500/30 hover:bg-amber-500/50 active:bg-amber-500/80 backdrop-blur-xs border border-amber-400/20 text-white rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all select-none shadow-md"
                       >
-                        <span className="text-[6px] sm:text-[8px] font-mono opacity-80 uppercase leading-none mb-0.5">Gambeta</span>
-                        <span className="text-[10px] sm:text-xs font-black leading-none">✨ AMBAR</span>
+                        <span className="text-[8px] font-mono opacity-80 uppercase leading-none mb-0.5">Gambeta</span>
+                        <span className="text-xs font-black leading-none">✨ AMBAR</span>
                       </button>
 
                       {/* Patear Action */}
                       <button
                         onClick={triggerKick}
-                        className="h-10 w-16 sm:h-12 sm:w-24 bg-emerald-500/30 hover:bg-emerald-500/50 active:bg-emerald-500/80 backdrop-blur-xs border border-emerald-400/20 text-white rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all select-none shadow-md"
+                        className="h-12 w-24 bg-emerald-500/30 hover:bg-emerald-500/50 active:bg-emerald-500/80 backdrop-blur-xs border border-emerald-400/20 text-white rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all select-none shadow-md"
                       >
-                        <span className="text-[6px] sm:text-[8px] font-mono opacity-80 uppercase leading-none mb-0.5">Rematar</span>
-                        <span className="text-[10px] sm:text-xs font-black leading-none">⚽ PATEAR</span>
+                        <span className="text-[8px] font-mono opacity-80 uppercase leading-none mb-0.5">Rematar</span>
+                        <span className="text-xs font-black leading-none">⚽ PATEAR</span>
                       </button>
                     </div>
                   </>
@@ -2849,6 +2849,135 @@ export default function App() {
                     </motion.div>
                   </div>
                 )}
+              </div>
+
+              {/* MOBILE PORTRAIT DASHBOARD (Controls + Stats) */}
+              <div className="flex md:hidden flex-col justify-between gap-1.5 p-2 bg-slate-900/90 border border-slate-800/80 rounded-xl flex-1 mt-1.5 overflow-hidden min-h-[180px]">
+                {/* Micro stats Row */}
+                <div className="grid grid-cols-4 gap-1 w-full flex-shrink-0">
+                  <div className="bg-slate-950 border border-slate-800 p-1 rounded-lg flex flex-col items-center justify-center">
+                    <span className="text-[8px] font-mono text-slate-400 uppercase font-black tracking-tighter">Puntos</span>
+                    <span className="text-xs font-black font-mono text-sky-400 leading-none mt-0.5">{stats.score}</span>
+                  </div>
+                  <div className="bg-slate-950 border border-slate-800 p-1 rounded-lg flex flex-col items-center justify-center">
+                    <span className="text-[8px] font-mono text-slate-400 uppercase font-black tracking-tighter">Goles</span>
+                    <span className="text-xs font-black font-mono text-emerald-400 leading-none mt-0.5">⚽ {stats.goals}</span>
+                  </div>
+                  <div className="bg-slate-950 border border-slate-800 p-1 rounded-lg flex flex-col items-center justify-center">
+                    <span className="text-[8px] font-mono text-slate-400 uppercase font-black tracking-tighter">Energía</span>
+                    <span className="text-xs font-black font-mono text-rose-400 leading-none mt-0.5">{playerRef.current.energy}%</span>
+                  </div>
+                  <div className="bg-slate-950 border border-slate-800 p-1 rounded-lg flex flex-col items-center justify-center">
+                    <span className="text-[8px] font-mono text-slate-400 uppercase font-black tracking-tighter">Tiempo</span>
+                    <span className="text-xs font-black font-mono text-indigo-400 leading-none mt-0.5">{stats.timeRemaining}s</span>
+                  </div>
+                </div>
+
+                {/* Slim Magia Charge Bar */}
+                <div className="bg-slate-950/90 border border-slate-800 px-2 py-1 rounded-lg flex items-center justify-between gap-2 flex-shrink-0">
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <Zap className="w-3 h-3 text-sky-400 animate-pulse" />
+                    <span className="text-[8px] font-mono font-black text-white">MAGIA</span>
+                  </div>
+                  <div className="flex-1 bg-slate-900 h-3 border border-slate-800 rounded-md relative overflow-hidden flex items-center">
+                    <div 
+                      className="absolute left-0 top-0 h-full bg-gradient-to-r from-sky-400 to-sky-300 transition-all duration-300 opacity-80"
+                      style={{ width: `${playerRef.current.magic}%` }}
+                    />
+                    {playerRef.current.isMagicActive && (
+                      <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-r from-amber-500 via-sky-400 to-amber-400 animate-pulse opacity-90" />
+                    )}
+                    <span className="z-10 text-[8px] font-black font-mono text-white mx-auto leading-none">
+                      {playerRef.current.isMagicActive ? `ACTIVA: ${Math.ceil(playerRef.current.magicTimer)}s` : `${playerRef.current.magic}%`}
+                    </span>
+                  </div>
+                  <button
+                    onClick={activateMagia}
+                    disabled={playerRef.current.magic < 100 || playerRef.current.isMagicActive}
+                    className={`px-2 py-0.5 rounded font-black text-[8px] font-mono tracking-tighter cursor-pointer transition-all flex-shrink-0 ${
+                      playerRef.current.magic >= 100 && !playerRef.current.isMagicActive
+                        ? "bg-amber-500 text-slate-950 animate-bounce"
+                        : "bg-slate-800 text-slate-500 cursor-not-allowed"
+                    }`}
+                  >
+                    ACTIVAR
+                  </button>
+                </div>
+
+                {/* Integrated Handheld Controller layout */}
+                <div className="flex items-center justify-between gap-2 mt-0.5 flex-1 min-h-0">
+                  {/* Left Side: Handheld Arcade D-Pad */}
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center justify-center select-none flex-shrink-0">
+                    <div className="grid grid-cols-3 gap-0.5 w-full h-full">
+                      <div />
+                      <button
+                        onMouseDown={() => { keysPressed.current["w"] = true; }}
+                        onMouseUp={() => { keysPressed.current["w"] = false; }}
+                        onTouchStart={(e) => { e.preventDefault(); keysPressed.current["w"] = true; }}
+                        onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["w"] = false; }}
+                        className="rounded-md bg-slate-800 active:bg-sky-500 text-white font-black text-xs border border-slate-700 cursor-pointer flex items-center justify-center select-none"
+                      >
+                        ▲
+                      </button>
+                      <div />
+
+                      <button
+                        onMouseDown={() => { keysPressed.current["a"] = true; }}
+                        onMouseUp={() => { keysPressed.current["a"] = false; }}
+                        onTouchStart={(e) => { e.preventDefault(); keysPressed.current["a"] = true; }}
+                        onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["a"] = false; }}
+                        className="rounded-md bg-slate-800 active:bg-sky-500 text-white font-black text-xs border border-slate-700 cursor-pointer flex items-center justify-center select-none"
+                      >
+                        ◀
+                      </button>
+                      <div className="flex items-center justify-center text-slate-600 font-mono text-[7px] uppercase font-black tracking-tighter">
+                        PAD
+                      </div>
+                      <button
+                        onMouseDown={() => { keysPressed.current["d"] = true; }}
+                        onMouseUp={() => { keysPressed.current["d"] = false; }}
+                        onTouchStart={(e) => { e.preventDefault(); keysPressed.current["d"] = true; }}
+                        onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["d"] = false; }}
+                        className="rounded-md bg-slate-800 active:bg-sky-500 text-white font-black text-xs border border-slate-700 cursor-pointer flex items-center justify-center select-none"
+                      >
+                        ▶
+                      </button>
+
+                      <div />
+                      <button
+                        onMouseDown={() => { keysPressed.current["s"] = true; }}
+                        onMouseUp={() => { keysPressed.current["s"] = false; }}
+                        onTouchStart={(e) => { e.preventDefault(); keysPressed.current["s"] = true; }}
+                        onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["s"] = false; }}
+                        className="rounded-md bg-slate-800 active:bg-sky-500 text-white font-black text-xs border border-slate-700 cursor-pointer flex items-center justify-center select-none"
+                      >
+                        ▼
+                      </button>
+                      <div />
+                    </div>
+                  </div>
+
+                  {/* Right Side: Big Arcade Action Buttons */}
+                  <div className="flex flex-col gap-1.5 flex-1 max-w-[150px] justify-center">
+                    <button
+                      onTouchStart={(e) => { e.preventDefault(); triggerDribble(); }}
+                      onClick={triggerDribble}
+                      className="w-full h-10 bg-gradient-to-r from-amber-500 to-amber-600 active:from-amber-600 active:to-amber-700 text-white rounded-lg border border-amber-400/20 flex flex-col items-center justify-center cursor-pointer transition-all select-none shadow-md"
+                    >
+                      <span className="text-[7px] font-mono opacity-80 uppercase leading-none mb-0.5">GAMBETA ✨</span>
+                      <span className="text-[10px] font-black leading-none">GAMBETEAR</span>
+                    </button>
+
+                    <button
+                      onTouchStart={(e) => { e.preventDefault(); triggerKick(); }}
+                      onClick={triggerKick}
+                      className="w-full h-10 bg-gradient-to-r from-emerald-500 to-emerald-600 active:from-emerald-600 active:to-emerald-700 text-white rounded-lg border border-emerald-400/20 flex flex-col items-center justify-center cursor-pointer transition-all select-none shadow-md"
+                    >
+                      <span className="text-[7px] font-mono opacity-80 uppercase leading-none mb-0.5">REMATAR ⚽</span>
+                      <span className="text-[10px] font-black leading-none">PATEAR ARCO</span>
+                    </button>
+                  </div>
+                </div>
               </div>
 
             </motion.div>
