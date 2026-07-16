@@ -2539,7 +2539,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="w-full flex flex-col gap-1.5 md:gap-4 h-[calc(100vh-68px)] md:h-auto justify-between"
+              className="w-full flex flex-col gap-1.5 md:gap-4 h-[calc(100vh-72px)] md:h-auto justify-between overflow-hidden"
             >
               
               {/* GAME STATS BAR (Desktop only) */}
@@ -2658,7 +2658,7 @@ export default function App() {
               </div>
 
               {/* GAME STAGE VIEWPORT (CANVAS) */}
-              <div className="relative w-full aspect-video rounded-xl md:rounded-2xl overflow-hidden bg-[#14532d] border-2 md:border-4 border-slate-800 shadow-2xl flex items-center justify-center flex-shrink-0">
+              <div className="relative w-full h-[38vh] min-h-[220px] md:h-auto md:aspect-video rounded-xl md:rounded-2xl overflow-hidden bg-[#14532d] border-2 md:border-4 border-slate-800 shadow-2xl flex items-center justify-center flex-shrink-0">
                 
                 <canvas
                   ref={canvasRef}
@@ -2852,34 +2852,34 @@ export default function App() {
               </div>
 
               {/* MOBILE PORTRAIT DASHBOARD (Controls + Stats) */}
-              <div className="flex md:hidden flex-col justify-between gap-1.5 p-2 bg-slate-900/90 border border-slate-800/80 rounded-xl flex-1 mt-1.5 overflow-hidden min-h-[180px]">
+              <div className="flex md:hidden flex-col justify-between gap-2 p-3 bg-slate-900 border border-slate-800 rounded-xl h-[48vh] min-h-[240px] mt-1 overflow-hidden">
                 {/* Micro stats Row */}
-                <div className="grid grid-cols-4 gap-1 w-full flex-shrink-0">
-                  <div className="bg-slate-950 border border-slate-800 p-1 rounded-lg flex flex-col items-center justify-center">
-                    <span className="text-[8px] font-mono text-slate-400 uppercase font-black tracking-tighter">Puntos</span>
-                    <span className="text-xs font-black font-mono text-sky-400 leading-none mt-0.5">{stats.score}</span>
+                <div className="grid grid-cols-4 gap-1.5 w-full flex-shrink-0">
+                  <div className="bg-slate-950 border border-slate-800 p-1.5 rounded-lg flex flex-col items-center justify-center">
+                    <span className="text-[9px] font-mono text-slate-400 uppercase font-black tracking-tighter">Puntos</span>
+                    <span className="text-sm font-black font-mono text-sky-400 leading-none mt-0.5">{stats.score}</span>
                   </div>
-                  <div className="bg-slate-950 border border-slate-800 p-1 rounded-lg flex flex-col items-center justify-center">
-                    <span className="text-[8px] font-mono text-slate-400 uppercase font-black tracking-tighter">Goles</span>
-                    <span className="text-xs font-black font-mono text-emerald-400 leading-none mt-0.5">⚽ {stats.goals}</span>
+                  <div className="bg-slate-950 border border-slate-800 p-1.5 rounded-lg flex flex-col items-center justify-center">
+                    <span className="text-[9px] font-mono text-slate-400 uppercase font-black tracking-tighter">Goles</span>
+                    <span className="text-sm font-black font-mono text-emerald-400 leading-none mt-0.5">⚽ {stats.goals}</span>
                   </div>
-                  <div className="bg-slate-950 border border-slate-800 p-1 rounded-lg flex flex-col items-center justify-center">
-                    <span className="text-[8px] font-mono text-slate-400 uppercase font-black tracking-tighter">Energía</span>
-                    <span className="text-xs font-black font-mono text-rose-400 leading-none mt-0.5">{playerRef.current.energy}%</span>
+                  <div className="bg-slate-950 border border-slate-800 p-1.5 rounded-lg flex flex-col items-center justify-center">
+                    <span className="text-[9px] font-mono text-slate-400 uppercase font-black tracking-tighter">Energía</span>
+                    <span className="text-sm font-black font-mono text-rose-400 leading-none mt-0.5">{playerRef.current.energy}%</span>
                   </div>
-                  <div className="bg-slate-950 border border-slate-800 p-1 rounded-lg flex flex-col items-center justify-center">
-                    <span className="text-[8px] font-mono text-slate-400 uppercase font-black tracking-tighter">Tiempo</span>
-                    <span className="text-xs font-black font-mono text-indigo-400 leading-none mt-0.5">{stats.timeRemaining}s</span>
+                  <div className="bg-slate-950 border border-slate-800 p-1.5 rounded-lg flex flex-col items-center justify-center">
+                    <span className="text-[9px] font-mono text-slate-400 uppercase font-black tracking-tighter">Tiempo</span>
+                    <span className="text-sm font-black font-mono text-indigo-400 leading-none mt-0.5">{stats.timeRemaining}s</span>
                   </div>
                 </div>
 
                 {/* Slim Magia Charge Bar */}
-                <div className="bg-slate-950/90 border border-slate-800 px-2 py-1 rounded-lg flex items-center justify-between gap-2 flex-shrink-0">
+                <div className="bg-slate-950 border border-slate-800 px-2 py-1.5 rounded-lg flex items-center justify-between gap-2 flex-shrink-0">
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <Zap className="w-3 h-3 text-sky-400 animate-pulse" />
-                    <span className="text-[8px] font-mono font-black text-white">MAGIA</span>
+                    <Zap className="w-3.5 h-3.5 text-sky-400 animate-pulse" />
+                    <span className="text-[9px] font-mono font-black text-white">MAGIA</span>
                   </div>
-                  <div className="flex-1 bg-slate-900 h-3 border border-slate-800 rounded-md relative overflow-hidden flex items-center">
+                  <div className="flex-1 bg-slate-900 h-3.5 border border-slate-800 rounded-md relative overflow-hidden flex items-center">
                     <div 
                       className="absolute left-0 top-0 h-full bg-gradient-to-r from-sky-400 to-sky-300 transition-all duration-300 opacity-80"
                       style={{ width: `${playerRef.current.magic}%` }}
@@ -2887,14 +2887,14 @@ export default function App() {
                     {playerRef.current.isMagicActive && (
                       <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-r from-amber-500 via-sky-400 to-amber-400 animate-pulse opacity-90" />
                     )}
-                    <span className="z-10 text-[8px] font-black font-mono text-white mx-auto leading-none">
+                    <span className="z-10 text-[9px] font-black font-mono text-white mx-auto leading-none">
                       {playerRef.current.isMagicActive ? `ACTIVA: ${Math.ceil(playerRef.current.magicTimer)}s` : `${playerRef.current.magic}%`}
                     </span>
                   </div>
                   <button
                     onClick={activateMagia}
                     disabled={playerRef.current.magic < 100 || playerRef.current.isMagicActive}
-                    className={`px-2 py-0.5 rounded font-black text-[8px] font-mono tracking-tighter cursor-pointer transition-all flex-shrink-0 ${
+                    className={`px-2 py-0.5 rounded font-black text-[9px] font-mono tracking-tighter cursor-pointer transition-all flex-shrink-0 ${
                       playerRef.current.magic >= 100 && !playerRef.current.isMagicActive
                         ? "bg-amber-500 text-slate-950 animate-bounce"
                         : "bg-slate-800 text-slate-500 cursor-not-allowed"
@@ -2905,9 +2905,9 @@ export default function App() {
                 </div>
 
                 {/* Integrated Handheld Controller layout */}
-                <div className="flex items-center justify-between gap-2 mt-0.5 flex-1 min-h-0">
+                <div className="flex items-center justify-between gap-4 mt-1 flex-1 min-h-0">
                   {/* Left Side: Handheld Arcade D-Pad */}
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center justify-center select-none flex-shrink-0">
+                  <div className="w-28 h-28 sm:w-32 sm:h-32 bg-slate-950 p-1.5 rounded-2xl border-2 border-slate-800 flex items-center justify-center select-none flex-shrink-0 shadow-inner">
                     <div className="grid grid-cols-3 gap-0.5 w-full h-full">
                       <div />
                       <button
@@ -2915,7 +2915,7 @@ export default function App() {
                         onMouseUp={() => { keysPressed.current["w"] = false; }}
                         onTouchStart={(e) => { e.preventDefault(); keysPressed.current["w"] = true; }}
                         onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["w"] = false; }}
-                        className="rounded-md bg-slate-800 active:bg-sky-500 text-white font-black text-xs border border-slate-700 cursor-pointer flex items-center justify-center select-none"
+                        className="rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-sky-500 active:text-slate-950 text-white font-black text-sm border border-slate-700 cursor-pointer flex items-center justify-center select-none transition-all active:scale-90"
                       >
                         ▲
                       </button>
@@ -2926,11 +2926,11 @@ export default function App() {
                         onMouseUp={() => { keysPressed.current["a"] = false; }}
                         onTouchStart={(e) => { e.preventDefault(); keysPressed.current["a"] = true; }}
                         onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["a"] = false; }}
-                        className="rounded-md bg-slate-800 active:bg-sky-500 text-white font-black text-xs border border-slate-700 cursor-pointer flex items-center justify-center select-none"
+                        className="rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-sky-500 active:text-slate-950 text-white font-black text-sm border border-slate-700 cursor-pointer flex items-center justify-center select-none transition-all active:scale-90"
                       >
                         ◀
                       </button>
-                      <div className="flex items-center justify-center text-slate-600 font-mono text-[7px] uppercase font-black tracking-tighter">
+                      <div className="flex items-center justify-center text-slate-600 font-mono text-[8px] sm:text-[10px] uppercase font-black tracking-tighter animate-pulse">
                         PAD
                       </div>
                       <button
@@ -2938,7 +2938,7 @@ export default function App() {
                         onMouseUp={() => { keysPressed.current["d"] = false; }}
                         onTouchStart={(e) => { e.preventDefault(); keysPressed.current["d"] = true; }}
                         onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["d"] = false; }}
-                        className="rounded-md bg-slate-800 active:bg-sky-500 text-white font-black text-xs border border-slate-700 cursor-pointer flex items-center justify-center select-none"
+                        className="rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-sky-500 active:text-slate-950 text-white font-black text-sm border border-slate-700 cursor-pointer flex items-center justify-center select-none transition-all active:scale-90"
                       >
                         ▶
                       </button>
@@ -2949,7 +2949,7 @@ export default function App() {
                         onMouseUp={() => { keysPressed.current["s"] = false; }}
                         onTouchStart={(e) => { e.preventDefault(); keysPressed.current["s"] = true; }}
                         onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["s"] = false; }}
-                        className="rounded-md bg-slate-800 active:bg-sky-500 text-white font-black text-xs border border-slate-700 cursor-pointer flex items-center justify-center select-none"
+                        className="rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-sky-500 active:text-slate-950 text-white font-black text-sm border border-slate-700 cursor-pointer flex items-center justify-center select-none transition-all active:scale-90"
                       >
                         ▼
                       </button>
@@ -2958,23 +2958,23 @@ export default function App() {
                   </div>
 
                   {/* Right Side: Big Arcade Action Buttons */}
-                  <div className="flex flex-col gap-1.5 flex-1 max-w-[150px] justify-center">
+                  <div className="flex flex-col gap-2.5 flex-1 max-w-[170px] justify-center h-full">
                     <button
                       onTouchStart={(e) => { e.preventDefault(); triggerDribble(); }}
                       onClick={triggerDribble}
-                      className="w-full h-10 bg-gradient-to-r from-amber-500 to-amber-600 active:from-amber-600 active:to-amber-700 text-white rounded-lg border border-amber-400/20 flex flex-col items-center justify-center cursor-pointer transition-all select-none shadow-md"
+                      className="w-full h-12 bg-gradient-to-b from-amber-400 to-amber-600 active:from-amber-600 active:to-amber-700 text-slate-950 font-extrabold rounded-xl border-t-2 border-amber-300 shadow-md shadow-amber-500/10 flex flex-col items-center justify-center cursor-pointer transition-all select-none active:scale-95"
                     >
-                      <span className="text-[7px] font-mono opacity-80 uppercase leading-none mb-0.5">GAMBETA ✨</span>
-                      <span className="text-[10px] font-black leading-none">GAMBETEAR</span>
+                      <span className="text-[8px] font-mono opacity-80 uppercase leading-none mb-0.5">GAMBETA ✨</span>
+                      <span className="text-xs font-black tracking-tight leading-none">GAMBETEAR</span>
                     </button>
 
                     <button
                       onTouchStart={(e) => { e.preventDefault(); triggerKick(); }}
                       onClick={triggerKick}
-                      className="w-full h-10 bg-gradient-to-r from-emerald-500 to-emerald-600 active:from-emerald-600 active:to-emerald-700 text-white rounded-lg border border-emerald-400/20 flex flex-col items-center justify-center cursor-pointer transition-all select-none shadow-md"
+                      className="w-full h-12 bg-gradient-to-b from-emerald-400 to-emerald-600 active:from-emerald-600 active:to-emerald-700 text-white font-extrabold rounded-xl border-t-2 border-emerald-300 shadow-md shadow-emerald-500/10 flex flex-col items-center justify-center cursor-pointer transition-all select-none active:scale-95"
                     >
-                      <span className="text-[7px] font-mono opacity-80 uppercase leading-none mb-0.5">REMATAR ⚽</span>
-                      <span className="text-[10px] font-black leading-none">PATEAR ARCO</span>
+                      <span className="text-[8px] font-mono opacity-80 uppercase leading-none mb-0.5">REMATAR ⚽</span>
+                      <span className="text-xs font-black tracking-tight leading-none">PATEAR ARCO</span>
                     </button>
                   </div>
                 </div>
