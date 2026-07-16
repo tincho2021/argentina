@@ -88,6 +88,30 @@ const MAGIC_COMMENTS = [
 ];
 
 const getTerrainType = (x: number, y: number) => {
+  // 1. Bridge check (rustic wooden bridge crossing the sound)
+  if (x >= 1110 && x <= 1290 && y >= 265 && y <= 365) {
+    return "land";
+  }
+
+  // 2. Minor surrounding islands checks
+  // Saunders Island (Isla Trinidad)
+  if (x >= 340 && x <= 510 && y >= 70 && y <= 125) return "land";
+  // Keppel Island (Isla Vigía)
+  if (x >= 530 && x <= 640 && y >= 70 && y <= 115) return "land";
+  // Pebble Island (Isla Borbón)
+  if (x >= 660 && x <= 880 && y >= 75 && y <= 130) return "land";
+  // Weddell Island (Isla San José)
+  if (x >= 40 && x <= 120 && y >= 430 && y <= 535) return "land";
+  // Beaver Island (Isla San Rafael)
+  if (x >= 20 && x <= 80 && y >= 370 && y <= 440) return "land";
+  // Lively Island (Isla Lively)
+  if (x >= 1980 && x <= 2110 && y >= 430 && y <= 515) return "land";
+  // Bleaker Island (Isla María)
+  if (x >= 1800 && x <= 1920 && y >= 515 && y <= 575) return "land";
+  // Sea Lion Island (Isla de los Leones Marinos)
+  if (x >= 1610 && x <= 1720 && y >= 545 && y <= 595) return "land";
+
+  // 3. Main islands ellipses checks
   const dxWest = x - 600;
   const dyWest = y - 315;
   const onWestIsland = (dxWest * dxWest) / (520 * 520) + (dyWest * dyWest) / (205 * 205) <= 1;
@@ -97,6 +121,143 @@ const getTerrainType = (x: number, y: number) => {
   const onEastIsland = (dxEast * dxEast) / (510 * 510) + (dyEast * dyEast) / (205 * 205) <= 1;
   
   return (onWestIsland || onEastIsland) ? "land" : "water";
+};
+
+// --- Flags Drawing Helpers ---
+const drawUnionJack = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) => {
+  ctx.save();
+  // Blue background
+  ctx.fillStyle = "#00247d";
+  ctx.fillRect(x, y, w, h);
+
+  // White diagonals
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 25;
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + w, y + h);
+  ctx.moveTo(x + w, y);
+  ctx.lineTo(x, y + h);
+  ctx.stroke();
+
+  // Red diagonals
+  ctx.strokeStyle = "#cf142b";
+  ctx.lineWidth = 10;
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + w, y + h);
+  ctx.moveTo(x + w, y);
+  ctx.lineTo(x, y + h);
+  ctx.stroke();
+
+  // White symmetric cross
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 50;
+  ctx.beginPath();
+  ctx.moveTo(x + w / 2, y);
+  ctx.lineTo(x + w / 2, y + h);
+  ctx.moveTo(x, y + h / 2);
+  ctx.lineTo(x + w, y + h / 2);
+  ctx.stroke();
+
+  // Red symmetric cross
+  ctx.strokeStyle = "#cf142b";
+  ctx.lineWidth = 30;
+  ctx.beginPath();
+  ctx.moveTo(x + w / 2, y);
+  ctx.lineTo(x + w / 2, y + h);
+  ctx.moveTo(x, y + h / 2);
+  ctx.lineTo(x + w, y + h / 2);
+  ctx.stroke();
+
+  ctx.restore();
+};
+
+const drawAlbiceleste = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) => {
+  ctx.save();
+  const bandH = h / 3;
+
+  // Top Light Blue band
+  ctx.fillStyle = "#74acdf";
+  ctx.fillRect(x, y, w, bandH);
+
+  // Middle White band
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(x, y + bandH, w, bandH);
+
+  // Bottom Light Blue band
+  ctx.fillStyle = "#74acdf";
+  ctx.fillRect(x, y + 2 * bandH, w, bandH);
+
+  // Sun of May in the center
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+  const sunR = 25;
+
+  // Draw Sun face/circle
+  ctx.fillStyle = "#f59e0b"; // Amber/gold
+  ctx.beginPath();
+  ctx.arc(cx, cy, sunR, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Draw rays
+  ctx.strokeStyle = "#f59e0b";
+  ctx.lineWidth = 2.5;
+  const rayCount = 16;
+  for (let i = 0; i < rayCount; i++) {
+    const angle = (i * 2 * Math.PI) / rayCount;
+    const isLong = i % 2 === 0;
+    const rOuter = sunR * (isLong ? 1.8 : 1.3);
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(angle) * sunR, cy + Math.sin(angle) * sunR);
+    ctx.lineTo(cx + Math.cos(angle) * rOuter, cy + Math.sin(angle) * rOuter);
+    ctx.stroke();
+  }
+
+  // Draw tiny happy sun eyes/smile
+  ctx.fillStyle = "#78350f";
+  ctx.beginPath();
+  ctx.arc(cx - 7, cy - 3, 2, 0, Math.PI * 2);
+  ctx.arc(cx + 7, cy - 3, 2, 0, Math.PI * 2);
+  ctx.fill();
+  
+  ctx.strokeStyle = "#78350f";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(cx, cy + 2, 6, 0, Math.PI);
+  ctx.stroke();
+
+  ctx.restore();
+};
+
+const drawIslandPattern = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, ratio: number) => {
+  ctx.save();
+  
+  // 1. Draw British Union Jack
+  drawUnionJack(ctx, x, y, w, h);
+
+  // 2. Blend Argentine Albiceleste flag on top
+  if (ratio > 0) {
+    ctx.save();
+    ctx.globalAlpha = ratio;
+    drawAlbiceleste(ctx, x, y, w, h);
+    ctx.restore();
+  }
+  
+  ctx.restore();
+
+  // 3. Draw subtle soccer field grass stripe pattern on top to keep it feeling like a soccer field!
+  ctx.save();
+  const stripeW = 60;
+  const startS = Math.floor(x / stripeW);
+  const endS = Math.ceil((x + w) / stripeW);
+  for (let s = startS; s <= endS; s++) {
+    // Alternating dark and light overlays
+    ctx.fillStyle = s % 2 === 0 ? "rgba(0, 0, 0, 0.08)" : "rgba(255, 255, 255, 0.04)";
+    const rx = s * stripeW;
+    ctx.fillRect(rx, y, stripeW, h);
+  }
+  ctx.restore();
 };
 
 export default function App() {
@@ -1170,29 +1331,103 @@ export default function App() {
     }
   };
 
-  // Falkland/Malvinas Islands Path Helpers
-  const drawWestFalklandPath = (c: CanvasRenderingContext2D, cX: number, scaleOffset = 0) => {
+  // Falkland/Malvinas Islands Path Helpers (Highly faithful to actual geography + surrounding minor islands)
+  const drawWestFalklandPath = (c: CanvasRenderingContext2D, cX: number) => {
+    // Main Gran Malvina Island
     c.beginPath();
-    c.moveTo(80 - cX - scaleOffset, 240 - scaleOffset);
-    c.bezierCurveTo(150 - cX, 120 - scaleOffset, 450 - cX, 90 - scaleOffset, 650 - cX, 130 - scaleOffset); // North coast
-    c.bezierCurveTo(750 - cX, 150, 900 - cX, 120, 1000 - cX + scaleOffset, 180 - scaleOffset); // Indentation
-    c.bezierCurveTo(1100 - cX + scaleOffset, 220, 1120 - cX + scaleOffset, 320, 1080 - cX + scaleOffset, 420 + scaleOffset); // East coast
-    c.bezierCurveTo(1000 - cX, 480, 850 - cX, 530 + scaleOffset, 650 - cX, 520 + scaleOffset); // South-east coast
-    c.bezierCurveTo(450 - cX, 510, 250 - cX, 540 + scaleOffset, 150 - cX - scaleOffset, 480 + scaleOffset); // Southwest
-    c.bezierCurveTo(70 - cX - scaleOffset, 440, 50 - cX - scaleOffset, 320, 80 - cX - scaleOffset, 240 - scaleOffset);
+    c.moveTo(140 - cX, 240);
+    // North Coast with intricate bays
+    c.bezierCurveTo(200 - cX, 150, 250 - cX, 160, 320 - cX, 140); // Byron Sound inlet
+    c.bezierCurveTo(380 - cX, 130, 420 - cX, 170, 480 - cX, 150);
+    c.bezierCurveTo(550 - cX, 130, 620 - cX, 120, 700 - cX, 150); // Pebble Sound area
+    c.bezierCurveTo(780 - cX, 170, 840 - cX, 140, 900 - cX, 160); // Tamar Pass
+    c.bezierCurveTo(960 - cX, 180, 1020 - cX, 190, 1080 - cX, 220); // North entry of Falkland Sound
+    
+    // East Coast along Falkland Sound
+    c.bezierCurveTo(1110 - cX, 250, 1060 - cX, 300, 1070 - cX, 330); // San Carlos Strait shoreline (near bridge)
+    c.bezierCurveTo(1080 - cX, 360, 1040 - cX, 390, 1020 - cX, 420); // Port Stephens / Fox Bay inlets
+    c.bezierCurveTo(960 - cX, 460, 920 - cX, 480, 850 - cX, 510); // South-east coast
+    
+    // South Coast
+    c.bezierCurveTo(750 - cX, 520, 650 - cX, 500, 580 - cX, 490); // South Cape area
+    c.bezierCurveTo(480 - cX, 480, 420 - cX, 540, 320 - cX, 510); // Queen Charlotte Bay
+    c.bezierCurveTo(240 - cX, 480, 190 - cX, 530, 140 - cX, 460); // King George Bay
+    c.bezierCurveTo(100 - cX, 410, 110 - cX, 330, 140 - cX, 240); // Port Philomel inlet back to start
+    c.closePath();
+
+    // Surrounding minor islands of Gran Malvina
+    // 1. Isla Trinidad / Saunders Island (North-West)
+    c.moveTo(350 - cX, 90);
+    c.bezierCurveTo(400 - cX, 70, 480 - cX, 80, 500 - cX, 100);
+    c.bezierCurveTo(460 - cX, 120, 380 - cX, 110, 350 - cX, 90);
+    c.closePath();
+
+    // 2. Isla Vigía / Keppel Island (North-Central)
+    c.moveTo(540 - cX, 85);
+    c.bezierCurveTo(580 - cX, 70, 620 - cX, 80, 630 - cX, 100);
+    c.bezierCurveTo(590 - cX, 110, 550 - cX, 105, 540 - cX, 85);
+    c.closePath();
+
+    // 3. Isla Borbón / Pebble Island (North-East)
+    c.moveTo(670 - cX, 95);
+    c.bezierCurveTo(740 - cX, 75, 840 - cX, 85, 870 - cX, 110);
+    c.bezierCurveTo(800 - cX, 125, 720 - cX, 115, 670 - cX, 95);
+    c.closePath();
+
+    // 4. Isla San José / Weddell Island (South-West)
+    c.moveTo(50 - cX, 460);
+    c.bezierCurveTo(90 - cX, 430, 110 - cX, 480, 95 - cX, 515);
+    c.bezierCurveTo(60 - cX, 530, 40 - cX, 500, 50 - cX, 460);
+    c.closePath();
+
+    // 5. Isla San Rafael / Beaver Island (Westmost)
+    c.moveTo(35 - cX, 390);
+    c.bezierCurveTo(65 - cX, 375, 75 - cX, 410, 60 - cX, 430);
+    c.bezierCurveTo(40 - cX, 435, 25 - cX, 410, 35 - cX, 390);
     c.closePath();
   };
 
-  const drawEastFalklandPath = (c: CanvasRenderingContext2D, cX: number, scaleOffset = 0) => {
+  const drawEastFalklandPath = (c: CanvasRenderingContext2D, cX: number) => {
+    // Main Isla Soledad Island
     c.beginPath();
-    c.moveTo(1320 - cX - scaleOffset, 180 - scaleOffset);
-    c.bezierCurveTo(1450 - cX, 110 - scaleOffset, 1850 - cX, 100 - scaleOffset, 2150 - cX + scaleOffset, 140 - scaleOffset); // North coast
-    c.bezierCurveTo(2280 - cX + scaleOffset, 160, 2350 - cX + scaleOffset, 250, 2320 - cX + scaleOffset, 350 + scaleOffset); // East coast
-    c.bezierCurveTo(2250 - cX + scaleOffset, 420, 2050 - cX + scaleOffset, 440, 1950 - cX + scaleOffset, 420 + scaleOffset); // Southeast
-    c.bezierCurveTo(1850 - cX, 460, 1850 - cX, 540 + scaleOffset, 1750 - cX, 530 + scaleOffset); // Lafonia southern bulge
-    c.bezierCurveTo(1600 - cX, 520, 1550 - cX, 480, 1520 - cX, 390); // Isthmus indent near Goose Green
-    c.bezierCurveTo(1480 - cX, 370, 1400 - cX, 390, 1340 - cX - scaleOffset, 440 + scaleOffset); // Southwest
-    c.bezierCurveTo(1260 - cX - scaleOffset, 320, 1260 - cX - scaleOffset, 240, 1320 - cX - scaleOffset, 180 - scaleOffset);
+    c.moveTo(1320 - cX, 180);
+    // North Coast with deep bays (Port Salvador, Berkeley Sound)
+    c.bezierCurveTo(1450 - cX, 110, 1550 - cX, 130, 1620 - cX, 170); // Port San Carlos / Macbride Head
+    c.bezierCurveTo(1680 - cX, 110, 1850 - cX, 90, 1950 - cX, 140); // Port Salvador inlet
+    c.bezierCurveTo(2050 - cX, 120, 2150 - cX, 100, 2220 - cX, 150); // Berkeley Sound / Cape Pembroke
+    
+    // East Coast with Stanley and inlets
+    c.bezierCurveTo(2290 - cX, 170, 2350 - cX, 230, 2310 - cX, 320); // Port William / Stanley Peninsula
+    c.bezierCurveTo(2250 - cX, 380, 2150 - cX, 390, 2080 - cX, 370); // Choiseul Sound inlet (north side)
+    
+    // Lafonia Peninsula (Southern half) - connected by a very narrow neck/isthmus at Darwin/Goose Green
+    // Neck at x = 1520, y = 370
+    c.bezierCurveTo(1950 - cX, 390, 1980 - cX, 430, 1940 - cX, 480); // Choiseul Sound south / Lafonia east coast
+    c.bezierCurveTo(1900 - cX, 520, 1820 - cX, 550, 1750 - cX, 540); // Adventure Sound / Southern tips
+    c.bezierCurveTo(1620 - cX, 530, 1580 - cX, 490, 1540 - cX, 400); // Narrow Isthmus near Goose Green
+    
+    // Falkland Sound East Coast (running northwards)
+    c.bezierCurveTo(1480 - cX, 390, 1380 - cX, 410, 1320 - cX, 430); // Grantham Sound
+    c.bezierCurveTo(1260 - cX, 340, 1260 - cX, 230, 1320 - cX, 180); // San Carlos shoreline back to start
+    c.closePath();
+
+    // Minor surrounding islands of Isla Soledad
+    // 1. Isla Lively / Lively Island (East of Lafonia)
+    c.moveTo(2020 - cX, 450);
+    c.bezierCurveTo(2070 - cX, 430, 2100 - cX, 470, 2080 - cX, 500);
+    c.bezierCurveTo(2030 - cX, 510, 1990 - cX, 480, 2020 - cX, 450);
+    c.closePath();
+
+    // 2. Isla María / Bleaker Island (Southeast of Lafonia)
+    c.moveTo(1840 - cX, 530);
+    c.bezierCurveTo(1890 - cX, 520, 1910 - cX, 550, 1870 - cX, 565);
+    c.bezierCurveTo(1820 - cX, 570, 1810 - cX, 540, 1840 - cX, 530);
+    c.closePath();
+
+    // 3. Isla de los Leones Marinos / Sea Lion Island (Far South)
+    c.moveTo(1640 - cX, 560);
+    c.bezierCurveTo(1680 - cX, 550, 1710 - cX, 565, 1690 - cX, 580);
+    c.bezierCurveTo(1650 - cX, 590, 1620 - cX, 575, 1640 - cX, 560);
     c.closePath();
   };
 
@@ -1242,50 +1477,52 @@ export default function App() {
       }
     }
 
-    // 3. Draw Sandy Beach Outline for both islands (rendered slightly larger)
-    ctx.fillStyle = "#fde047"; // Warm golden sand
-    drawWestFalklandPath(ctx, cameraX, 9);
-    ctx.fill();
-    drawEastFalklandPath(ctx, cameraX, 9);
-    ctx.fill();
+    // 3. Draw Sandy Beach Outline for both islands (rendered perfectly using thick sand border stroke)
+    ctx.strokeStyle = "#fde047"; // Warm golden sand
+    ctx.lineWidth = 18;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
 
-    // 4. Draw Grassy Surface (the interior of the islands) with turf stripes
+    ctx.beginPath();
+    drawWestFalklandPath(ctx, cameraX);
+    ctx.stroke();
+
+    ctx.beginPath();
+    drawEastFalklandPath(ctx, cameraX);
+    ctx.stroke();
+
+    // 4. Draw Flaged Interiors (with dynamic Union Jack to Albiceleste transition)
+    const albicelesteRatio = Math.min(goalsRef.current / 3, 1);
+
     // West Falkland interior
     ctx.save();
-    drawWestFalklandPath(ctx, cameraX, 0);
+    ctx.beginPath();
+    drawWestFalklandPath(ctx, cameraX);
     ctx.clip();
-    const stripeWidth = 80;
-    const startStripe = Math.floor(cameraX / stripeWidth);
-    const endStripe = Math.ceil((cameraX + CANVAS_WIDTH) / stripeWidth);
-    for (let s = startStripe; s <= endStripe; s++) {
-      ctx.fillStyle = s % 2 === 0 ? "#15803d" : "#166534"; // rich lawn greens
-      const rx = s * stripeWidth - cameraX;
-      ctx.fillRect(rx, 0, stripeWidth, CANVAS_HEIGHT);
-    }
+    drawIslandPattern(ctx, 50 - cameraX, 50, 1050, 530, albicelesteRatio);
     ctx.restore();
 
     // East Falkland interior
     ctx.save();
-    drawEastFalklandPath(ctx, cameraX, 0);
+    ctx.beginPath();
+    drawEastFalklandPath(ctx, cameraX);
     ctx.clip();
-    for (let s = startStripe; s <= endStripe; s++) {
-      ctx.fillStyle = s % 2 === 0 ? "#15803d" : "#166534";
-      const rx = s * stripeWidth - cameraX;
-      ctx.fillRect(rx, 0, stripeWidth, CANVAS_HEIGHT);
-    }
+    drawIslandPattern(ctx, 1260 - cameraX, 50, 1050, 530, albicelesteRatio);
     ctx.restore();
 
     // 5. White Chalk Boundary Outline following the coastlines
+    ctx.save();
     ctx.strokeStyle = "rgba(255, 255, 255, 0.65)";
     ctx.lineWidth = 3.5;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
     
-    ctx.save();
-    drawWestFalklandPath(ctx, cameraX, 0);
+    ctx.beginPath();
+    drawWestFalklandPath(ctx, cameraX);
     ctx.stroke();
-    ctx.restore();
 
-    ctx.save();
-    drawEastFalklandPath(ctx, cameraX, 0);
+    ctx.beginPath();
+    drawEastFalklandPath(ctx, cameraX);
     ctx.stroke();
     ctx.restore();
 
@@ -2057,7 +2294,7 @@ export default function App() {
               </p>
 
               {/* Instructions summary */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left max-w-lg mx-auto mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left max-w-lg mx-auto mb-4">
                 <div className="bg-slate-950/60 p-3.5 border border-slate-800/80 rounded-xl">
                   <p className="font-bold text-sky-400 text-sm mb-1 flex items-center gap-1.5">
                     🎮 Controles de Teclado
@@ -2077,6 +2314,16 @@ export default function App() {
                     Hacé gambetas cerca de los defensores para cargar tu barra. ¡Al activarla, correrás al doble de velocidad, los ingleses quedarán lentos y tu remate será imparable!
                   </p>
                 </div>
+              </div>
+
+              {/* Territory Recovery Instruction card */}
+              <div className="bg-slate-950/80 p-4 border border-sky-500/30 rounded-xl text-left max-w-lg mx-auto mb-8">
+                <p className="font-bold text-sky-400 text-sm mb-1.5 flex items-center gap-2">
+                  🗺️ Soberanía del Territorio
+                </p>
+                <p className="text-xs text-slate-300 font-mono leading-relaxed">
+                  Las islas comienzan con los <strong className="text-rose-400">colores británicos</strong>. A medida que "Messi" mete goles de leyenda, la geografía de las Malvinas se va tiñendo de <strong className="text-sky-300">albiceleste</strong>. ¡Con 3 goles la soberanía argentina es total!
+                </p>
               </div>
 
               <button
