@@ -496,17 +496,7 @@ export default function App() {
 
   // Add alerts visually on top of the turf
   const spawnAlert = (text: string, x: number, y: number, color = "#ffffff") => {
-    lastAlertIdRef.current += 1;
-    alertsRef.current.push({
-      id: `alert-${lastAlertIdRef.current}`,
-      text,
-      x,
-      y,
-      color,
-      timer: 1.8,
-      scale: 1
-    });
-    setActiveAlert(text);
+    // Player dialogues and alert speech bubbles are removed per user request.
   };
 
   // Trigger special dribble "Gambeta"
@@ -980,9 +970,9 @@ export default function App() {
     // Keeper Intercepts / Saves Ball
     if (b.owner === "none" && b.x > 2180 && b.x < 2250) {
       const gkDistY = Math.abs(b.y - gk.y);
-      // Keeper can save if ball is within reach Y and not too high
-      const maxGkReachY = p.isMagicActive ? 40 : 80;
-      const maxGkReachHeight = p.isMagicActive ? 30 : 65;
+      // Keeper can save if ball is within reach Y and not too high (reduced significantly to make scoring super easy!)
+      const maxGkReachY = p.isMagicActive ? 12 : 24;
+      const maxGkReachHeight = p.isMagicActive ? 10 : 18;
 
       if (gkDistY < maxGkReachY && b.height < maxGkReachHeight) {
         b.owner = "keeper";
@@ -1507,7 +1497,7 @@ export default function App() {
     ctx.stroke();
 
     // 4. Draw Flaged Interiors (with dynamic Union Jack to Albiceleste transition)
-    const albicelesteRatio = Math.min(goalsRef.current / 3, 1);
+    const albicelesteRatio = Math.min(goalsRef.current / 4, 1);
 
     // West Falkland interior
     ctx.save();
@@ -2528,7 +2518,7 @@ export default function App() {
                   🗺️ Soberanía del Territorio
                 </p>
                 <p className="text-xs text-slate-300 font-mono leading-relaxed">
-                  Las islas comienzan con los <strong className="text-rose-400">colores británicos</strong>. A medida que "Messi" mete goles de leyenda, la geografía de las Malvinas se va tiñendo de <strong className="text-sky-300">albiceleste</strong>. ¡Con 3 goles la soberanía argentina es total!
+                  Las islas comienzan con los <strong className="text-rose-400">colores británicos</strong>. A medida que "Messi" mete goles de leyenda, la geografía de las Malvinas se va tiñendo de <strong className="text-sky-300">albiceleste</strong>. ¡Con 4 goles la soberanía argentina es total y recuperás las Malvinas!
                 </p>
               </div>
 
@@ -2677,6 +2667,96 @@ export default function App() {
                   className="w-full h-full object-contain bg-[#14532d]"
                 />
 
+                {/* LEYENDA FIJA CUANDO SE CONVIERTE EL CUARTO GOL */}
+                {stats.goals >= 4 && (
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 z-40 pointer-events-none">
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="bg-gradient-to-r from-sky-400 via-white to-sky-400 border-2 border-sky-300 text-sky-950 font-black px-6 py-2 rounded-full shadow-2xl flex items-center gap-2 whitespace-nowrap text-sm sm:text-lg animate-pulse tracking-wide"
+                    >
+                      🇦🇷 RECUPERASTE LAS MALVINAS 🇦🇷
+                    </motion.div>
+                  </div>
+                )}
+
+                {/* TRANSLUCENT ARCADE VIRTUAL CONTROLLER OVERLAYS (Overlay directly on top of playfield) */}
+                {(gameState === "playing" || gameState === "celebrating") && (
+                  <>
+                    {/* D-PAD overlay on the bottom-left */}
+                    <div className="absolute left-2.5 bottom-2.5 sm:left-4 sm:bottom-4 z-30 bg-slate-950/50 backdrop-blur-xs p-1 rounded-xl border border-white/10 w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center pointer-events-auto">
+                      <div className="grid grid-cols-3 gap-0.5 w-full h-full">
+                        <div />
+                        <button
+                          onMouseDown={() => { keysPressed.current["w"] = true; }}
+                          onMouseUp={() => { keysPressed.current["w"] = false; }}
+                          onTouchStart={(e) => { e.preventDefault(); keysPressed.current["w"] = true; }}
+                          onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["w"] = false; }}
+                          className="rounded-md bg-white/10 active:bg-sky-500/60 text-white font-black text-xs sm:text-sm border border-white/5 cursor-pointer flex items-center justify-center select-none"
+                        >
+                          ▲
+                        </button>
+                        <div />
+
+                        <button
+                          onMouseDown={() => { keysPressed.current["a"] = true; }}
+                          onMouseUp={() => { keysPressed.current["a"] = false; }}
+                          onTouchStart={(e) => { e.preventDefault(); keysPressed.current["a"] = true; }}
+                          onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["a"] = false; }}
+                          className="rounded-md bg-white/10 active:bg-sky-500/60 text-white font-black text-xs sm:text-sm border border-white/5 cursor-pointer flex items-center justify-center select-none"
+                        >
+                          ◀
+                        </button>
+                        <div className="flex items-center justify-center text-white/20 font-mono text-[7px] sm:text-[9px] uppercase font-black tracking-tighter">
+                          PAD
+                        </div>
+                        <button
+                          onMouseDown={() => { keysPressed.current["d"] = true; }}
+                          onMouseUp={() => { keysPressed.current["d"] = false; }}
+                          onTouchStart={(e) => { e.preventDefault(); keysPressed.current["d"] = true; }}
+                          onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["d"] = false; }}
+                          className="rounded-md bg-white/10 active:bg-sky-500/60 text-white font-black text-xs sm:text-sm border border-white/5 cursor-pointer flex items-center justify-center select-none"
+                        >
+                          ▶
+                        </button>
+
+                        <div />
+                        <button
+                          onMouseDown={() => { keysPressed.current["s"] = true; }}
+                          onMouseUp={() => { keysPressed.current["s"] = false; }}
+                          onTouchStart={(e) => { e.preventDefault(); keysPressed.current["s"] = true; }}
+                          onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["s"] = false; }}
+                          className="rounded-md bg-white/10 active:bg-sky-500/60 text-white font-black text-xs sm:text-sm border border-white/5 cursor-pointer flex items-center justify-center select-none"
+                        >
+                          ▼
+                        </button>
+                        <div />
+                      </div>
+                    </div>
+
+                    {/* Action buttons overlay on the bottom-right */}
+                    <div className="absolute right-2.5 bottom-2.5 sm:right-4 sm:bottom-4 z-30 flex gap-1.5 pointer-events-auto">
+                      {/* Gambeta Action */}
+                      <button
+                        onClick={triggerDribble}
+                        className="h-10 w-16 sm:h-12 sm:w-24 bg-amber-500/30 hover:bg-amber-500/50 active:bg-amber-500/80 backdrop-blur-xs border border-amber-400/20 text-white rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all select-none shadow-md"
+                      >
+                        <span className="text-[6px] sm:text-[8px] font-mono opacity-80 uppercase leading-none mb-0.5">Gambeta</span>
+                        <span className="text-[10px] sm:text-xs font-black leading-none">✨ AMBAR</span>
+                      </button>
+
+                      {/* Patear Action */}
+                      <button
+                        onClick={triggerKick}
+                        className="h-10 w-16 sm:h-12 sm:w-24 bg-emerald-500/30 hover:bg-emerald-500/50 active:bg-emerald-500/80 backdrop-blur-xs border border-emerald-400/20 text-white rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all select-none shadow-md"
+                      >
+                        <span className="text-[6px] sm:text-[8px] font-mono opacity-80 uppercase leading-none mb-0.5">Rematar</span>
+                        <span className="text-[10px] sm:text-xs font-black leading-none">⚽ PATEAR</span>
+                      </button>
+                    </div>
+                  </>
+                )}
+
                 {/* CELEBRATION OVERLAYS (GOAL!) */}
                 {gameState === "celebrating" && (
                   <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center z-20 backdrop-blur-xs">
@@ -2687,12 +2767,25 @@ export default function App() {
                       className="text-center"
                     >
                       <span className="text-6xl sm:text-8xl block animate-bounce">⚽🔥</span>
-                      <h2 className="text-4xl sm:text-7xl font-black text-yellow-400 tracking-tight drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)]">
-                        ¡¡¡GOLAZO!!!
-                      </h2>
-                      <p className="text-lg sm:text-2xl font-bold text-white tracking-wider mt-2 bg-sky-500/80 px-6 py-2 rounded-full border border-sky-300/40 inline-block">
-                        ¡DEL MEJOR JUGADOR DEL MUNDO!
-                      </p>
+                      {stats.goals >= 4 ? (
+                        <>
+                          <h2 className="text-4xl sm:text-7xl font-black text-yellow-400 tracking-tight drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)] uppercase">
+                            RECUPERASTE LAS MALVINAS
+                          </h2>
+                          <p className="text-lg sm:text-2xl font-bold text-sky-950 tracking-wider mt-2 bg-gradient-to-r from-sky-400 via-white to-sky-400 px-6 py-2 rounded-full border border-white inline-block">
+                            🇦🇷 ¡SOBERANÍA NACIONAL COMPLETA! 🇦🇷
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <h2 className="text-4xl sm:text-7xl font-black text-yellow-400 tracking-tight drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)]">
+                            ¡¡¡GOLAZO!!!
+                          </h2>
+                          <p className="text-lg sm:text-2xl font-bold text-white tracking-wider mt-2 bg-sky-500/80 px-6 py-2 rounded-full border border-sky-300/40 inline-block">
+                            ¡DEL MEJOR JUGADOR DEL MUNDO!
+                          </p>
+                        </>
+                      )}
                     </motion.div>
                   </div>
                 )}
@@ -2730,12 +2823,20 @@ export default function App() {
                         </div>
                       </div>
 
-                      {/* Record indicator */}
-                      {stats.score >= stats.highScore && stats.score > 0 && (
-                        <div className="mb-6 bg-amber-500/10 border border-amber-500/30 px-3 py-2 rounded-xl text-amber-400 font-bold text-sm flex items-center justify-center gap-1.5">
-                          <Sparkles className="w-4 h-4" />
-                          ¡NUEVO RÉCORD CONSEGUIDO! 🌟
+                      {/* Record indicator / Sovereignty Victory indicator */}
+                      {stats.goals >= 4 ? (
+                        <div className="mb-6 bg-gradient-to-r from-sky-500/20 via-white/10 to-sky-500/20 border-2 border-sky-400/40 px-4 py-3 rounded-2xl text-sky-300 font-black text-sm sm:text-base animate-pulse flex flex-col items-center justify-center gap-1.5 shadow-lg">
+                          <span className="text-xl">🇦🇷🌟🇦🇷</span>
+                          <span>¡Soberanía Lograda!</span>
+                          <span className="text-white text-base font-extrabold uppercase">RECUPERASTE LAS MALVINAS</span>
                         </div>
+                      ) : (
+                        stats.score >= stats.highScore && stats.score > 0 && (
+                          <div className="mb-6 bg-amber-500/10 border border-amber-500/30 px-3 py-2 rounded-xl text-amber-400 font-bold text-sm flex items-center justify-center gap-1.5">
+                            <Sparkles className="w-4 h-4" />
+                            ¡NUEVO RÉCORD CONSEGUIDO! 🌟
+                          </div>
+                        )
                       )}
 
                       <button
@@ -2748,89 +2849,6 @@ export default function App() {
                     </motion.div>
                   </div>
                 )}
-              </div>
-
-              {/* MOBILE TOUCH CONTROLLERS (Shown nicely on mobile, always visible as a helpful option) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-xl mt-1">
-                
-                {/* Direction D-Pad */}
-                <div className="flex flex-col items-center justify-center">
-                  <p className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-2">Controles Táctiles de Dirección</p>
-                  
-                  <div className="grid grid-cols-3 gap-2 w-48">
-                    <div />
-                    <button
-                      onMouseDown={() => { keysPressed.current["w"] = true; }}
-                      onMouseUp={() => { keysPressed.current["w"] = false; }}
-                      onTouchStart={(e) => { e.preventDefault(); keysPressed.current["w"] = true; }}
-                      onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["w"] = false; }}
-                      className="h-12 rounded-xl bg-slate-800 active:bg-slate-700 text-slate-100 border border-slate-700 font-black text-lg cursor-pointer flex items-center justify-center select-none"
-                    >
-                      ▲
-                    </button>
-                    <div />
-
-                    <button
-                      onMouseDown={() => { keysPressed.current["a"] = true; }}
-                      onMouseUp={() => { keysPressed.current["a"] = false; }}
-                      onTouchStart={(e) => { e.preventDefault(); keysPressed.current["a"] = true; }}
-                      onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["a"] = false; }}
-                      className="h-12 rounded-xl bg-slate-800 active:bg-slate-700 text-slate-100 border border-slate-700 font-black text-lg cursor-pointer flex items-center justify-center select-none"
-                    >
-                      ◀
-                    </button>
-                    <div className="bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-center text-slate-600 font-mono text-[10px]">
-                      D-PAD
-                    </div>
-                    <button
-                      onMouseDown={() => { keysPressed.current["d"] = true; }}
-                      onMouseUp={() => { keysPressed.current["d"] = false; }}
-                      onTouchStart={(e) => { e.preventDefault(); keysPressed.current["d"] = true; }}
-                      onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["d"] = false; }}
-                      className="h-12 rounded-xl bg-slate-800 active:bg-slate-700 text-slate-100 border border-slate-700 font-black text-lg cursor-pointer flex items-center justify-center select-none"
-                    >
-                      ▶
-                    </button>
-
-                    <div />
-                    <button
-                      onMouseDown={() => { keysPressed.current["s"] = true; }}
-                      onMouseUp={() => { keysPressed.current["s"] = false; }}
-                      onTouchStart={(e) => { e.preventDefault(); keysPressed.current["s"] = true; }}
-                      onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["s"] = false; }}
-                      className="h-12 rounded-xl bg-slate-800 active:bg-slate-700 text-slate-100 border border-slate-700 font-black text-lg cursor-pointer flex items-center justify-center select-none"
-                    >
-                      ▼
-                    </button>
-                    <div />
-                  </div>
-                </div>
-
-                {/* Tactile Action Buttons */}
-                <div className="flex flex-col justify-center items-center gap-3">
-                  <p className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-1">Acciones del 10</p>
-                  
-                  <div className="flex gap-4 w-full max-w-sm">
-                    {/* Gambeta Action */}
-                    <button
-                      onClick={triggerDribble}
-                      className="flex-1 h-14 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 active:from-amber-600 active:to-amber-700 text-white font-extrabold rounded-2xl shadow-md border border-amber-400/30 flex flex-col items-center justify-center cursor-pointer transition-transform select-none"
-                    >
-                      <span className="text-[11px] font-mono opacity-85">GAMBETA SPECIAL</span>
-                      <span className="text-sm">¡GAMBETEAR! ✨</span>
-                    </button>
-
-                    {/* Patear Action */}
-                    <button
-                      onClick={triggerKick}
-                      className="flex-1 h-14 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 active:from-emerald-600 active:to-emerald-700 text-white font-extrabold rounded-2xl shadow-md border border-emerald-400/30 flex flex-col items-center justify-center cursor-pointer transition-transform select-none"
-                    >
-                      <span className="text-[11px] font-mono opacity-85">REMATAR AL ARCO</span>
-                      <span className="text-sm">¡PATEAR! ⚽</span>
-                    </button>
-                  </div>
-                </div>
-
               </div>
 
             </motion.div>
