@@ -274,6 +274,7 @@ export default function App() {
   });
 
   const [activeAlert, setActiveAlert] = useState<string | null>(null);
+  const [joystick, setJoystick] = useState({ x: 0, y: 0, isDragging: false });
 
   // References
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -446,6 +447,96 @@ export default function App() {
 
     // Clear alert list but keep fireworks particles
     alertsRef.current = [];
+  };
+
+  // Virtual Joystick touch handlers
+  const handleJoystickStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = e.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const dx = touch.clientX - centerX;
+    const dy = touch.clientY - centerY;
+    updateJoystickPosition(dx, dy, rect.width / 2);
+  };
+
+  const handleJoystickMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (e.touches.length === 0) return;
+    const touch = e.touches[0];
+    const rect = e.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const dx = touch.clientX - centerX;
+    const dy = touch.clientY - centerY;
+    updateJoystickPosition(dx, dy, rect.width / 2);
+  };
+
+  const handleJoystickEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setJoystick({ x: 0, y: 0, isDragging: false });
+    keysPressed.current["w"] = false;
+    keysPressed.current["s"] = false;
+    keysPressed.current["a"] = false;
+    keysPressed.current["d"] = false;
+  };
+
+  const handleJoystickMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const rect = e.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const dx = moveEvent.clientX - centerX;
+      const dy = moveEvent.clientY - centerY;
+      updateJoystickPosition(dx, dy, rect.width / 2);
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      setJoystick({ x: 0, y: 0, isDragging: false });
+      keysPressed.current["w"] = false;
+      keysPressed.current["s"] = false;
+      keysPressed.current["a"] = false;
+      keysPressed.current["d"] = false;
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+
+    const dx = e.clientX - centerX;
+    const dy = e.clientY - centerY;
+    updateJoystickPosition(dx, dy, rect.width / 2);
+  };
+
+  const updateJoystickPosition = (dx: number, dy: number, maxRadius: number) => {
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const angle = Math.atan2(dy, dx);
+    const limitRadius = maxRadius * 0.85;
+    const clampedDistance = Math.min(distance, limitRadius);
+    const x = Math.cos(angle) * clampedDistance;
+    const y = Math.sin(angle) * clampedDistance;
+
+    setJoystick({ x, y, isDragging: true });
+
+    const deadzone = 8;
+    if (distance > deadzone) {
+      const normX = dx / distance;
+      const normY = dy / distance;
+
+      keysPressed.current["a"] = normX < -0.38;
+      keysPressed.current["d"] = normX > 0.38;
+      keysPressed.current["w"] = normY < -0.38;
+      keysPressed.current["s"] = normY > 0.38;
+    } else {
+      keysPressed.current["w"] = false;
+      keysPressed.current["s"] = false;
+      keysPressed.current["a"] = false;
+      keysPressed.current["d"] = false;
+    }
   };
 
   // Start the entire match
@@ -2852,7 +2943,7 @@ export default function App() {
               </div>
 
               {/* MOBILE PORTRAIT DASHBOARD (Controls + Stats) */}
-              <div className="flex md:hidden flex-col justify-between gap-2 p-3 bg-slate-900 border border-slate-800 rounded-xl h-[48vh] min-h-[240px] mt-1 overflow-hidden">
+              <div className="flex md:hidden flex-col justify-between gap-2 p-3 bg-slate-900 border border-slate-800 rounded-xl h-[45vh] min-h-[250px] mt-1 overflow-hidden shadow-2xl">
                 {/* Micro stats Row */}
                 <div className="grid grid-cols-4 gap-1.5 w-full flex-shrink-0">
                   <div className="bg-slate-950 border border-slate-800 p-1.5 rounded-lg flex flex-col items-center justify-center">
@@ -2905,55 +2996,35 @@ export default function App() {
                 </div>
 
                 {/* Integrated Handheld Controller layout */}
-                <div className="flex items-center justify-between gap-4 mt-1 flex-1 min-h-0">
-                  {/* Left Side: Handheld Arcade D-Pad */}
-                  <div className="w-28 h-28 sm:w-32 sm:h-32 bg-slate-950 p-1.5 rounded-2xl border-2 border-slate-800 flex items-center justify-center select-none flex-shrink-0 shadow-inner">
-                    <div className="grid grid-cols-3 gap-0.5 w-full h-full">
-                      <div />
-                      <button
-                        onMouseDown={() => { keysPressed.current["w"] = true; }}
-                        onMouseUp={() => { keysPressed.current["w"] = false; }}
-                        onTouchStart={(e) => { e.preventDefault(); keysPressed.current["w"] = true; }}
-                        onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["w"] = false; }}
-                        className="rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-sky-500 active:text-slate-950 text-white font-black text-sm border border-slate-700 cursor-pointer flex items-center justify-center select-none transition-all active:scale-90"
-                      >
-                        ▲
-                      </button>
-                      <div />
+                <div className="flex items-center justify-between gap-4 mt-1 flex-1 min-h-0 pb-5 sm:pb-7">
+                  {/* Left Side: Ergonomic Touch Virtual Joystick */}
+                  <div 
+                    onTouchStart={handleJoystickStart}
+                    onTouchMove={handleJoystickMove}
+                    onTouchEnd={handleJoystickEnd}
+                    onMouseDown={handleJoystickMouseDown}
+                    className="w-28 h-28 sm:w-32 sm:h-32 bg-slate-950 rounded-full border-2 border-slate-800 flex items-center justify-center select-none flex-shrink-0 shadow-inner relative touch-none cursor-grab active:cursor-grabbing"
+                  >
+                    {/* Joystick Outer Ring Guideline */}
+                    <div className="absolute inset-2 rounded-full border border-slate-900/60 flex items-center justify-center pointer-events-none">
+                      <span className="text-[8px] font-mono font-black text-slate-700 tracking-wider">JOYSTICK</span>
+                    </div>
 
-                      <button
-                        onMouseDown={() => { keysPressed.current["a"] = true; }}
-                        onMouseUp={() => { keysPressed.current["a"] = false; }}
-                        onTouchStart={(e) => { e.preventDefault(); keysPressed.current["a"] = true; }}
-                        onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["a"] = false; }}
-                        className="rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-sky-500 active:text-slate-950 text-white font-black text-sm border border-slate-700 cursor-pointer flex items-center justify-center select-none transition-all active:scale-90"
-                      >
-                        ◀
-                      </button>
-                      <div className="flex items-center justify-center text-slate-600 font-mono text-[8px] sm:text-[10px] uppercase font-black tracking-tighter animate-pulse">
-                        PAD
+                    {/* Joystick Center Deadzone Ring */}
+                    <div className="absolute w-6 h-6 rounded-full border border-slate-900/20 bg-slate-900/10 pointer-events-none" />
+
+                    {/* Dynamic Sliding Joystick Knob */}
+                    <div 
+                      className="absolute w-12 h-12 rounded-full bg-gradient-to-b from-sky-400 to-sky-600 border border-sky-300 shadow-md flex items-center justify-center transition-transform duration-75 pointer-events-none"
+                      style={{
+                        transform: `translate(${joystick.x}px, ${joystick.y}px)`,
+                        boxShadow: joystick.isDragging ? "0 0 15px rgba(56, 189, 248, 0.6)" : "0 4px 6px rgba(0,0,0,0.3)"
+                      }}
+                    >
+                      {/* Inner design of the knob */}
+                      <div className="w-6 h-6 rounded-full bg-sky-300/30 border border-white/20 flex items-center justify-center">
+                        <div className="w-2.5 h-2.5 rounded-full bg-white opacity-80" />
                       </div>
-                      <button
-                        onMouseDown={() => { keysPressed.current["d"] = true; }}
-                        onMouseUp={() => { keysPressed.current["d"] = false; }}
-                        onTouchStart={(e) => { e.preventDefault(); keysPressed.current["d"] = true; }}
-                        onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["d"] = false; }}
-                        className="rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-sky-500 active:text-slate-950 text-white font-black text-sm border border-slate-700 cursor-pointer flex items-center justify-center select-none transition-all active:scale-90"
-                      >
-                        ▶
-                      </button>
-
-                      <div />
-                      <button
-                        onMouseDown={() => { keysPressed.current["s"] = true; }}
-                        onMouseUp={() => { keysPressed.current["s"] = false; }}
-                        onTouchStart={(e) => { e.preventDefault(); keysPressed.current["s"] = true; }}
-                        onTouchEnd={(e) => { e.preventDefault(); keysPressed.current["s"] = false; }}
-                        className="rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-sky-500 active:text-slate-950 text-white font-black text-sm border border-slate-700 cursor-pointer flex items-center justify-center select-none transition-all active:scale-90"
-                      >
-                        ▼
-                      </button>
-                      <div />
                     </div>
                   </div>
 
