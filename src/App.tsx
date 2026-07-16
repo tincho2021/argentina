@@ -46,45 +46,44 @@ const GOAL_BOTTOM = 400;
 
 // Commentaries lists
 const DRIBBLE_COMMENTS = [
-  "¡Qué gambeta del 10!",
-  "¡La pelota siempre al 10!",
-  "¡Dejó pagando al rival!",
-  "¡Y de repente... magia!",
-  "¡Desparramó a la defensa!",
-  "¡Lleva la pelota atada!",
-  "¡Fútbol total!"
+  "¡RECUPERA LAS MALVINAS! ¡Gambeta magistral por la justicia histórica!",
+  "¡RECUPERA LAS MALVINAS! ¡La pelota busca justicia divina en los pies del 10!",
+  "¡RECUPERA LAS MALVINAS! ¡Esquivando rivales en nombre de la justicia soberana!",
+  "¡RECUPERA LAS MALVINAS! ¡Gambeteando por la justicia de nuestra tierra!",
+  "¡RECUPERA LAS MALVINAS! ¡Magia albiceleste exigiendo justicia nacional!",
+  "¡RECUPERA LAS MALVINAS! ¡Lleva el balón de la justicia bien atado al botín!",
+  "¡RECUPERA LAS MALVINAS! ¡Fútbol de leyenda clamando justicia!"
 ];
 
 const KICK_COMMENTS = [
-  "¡Saca el bombazo!",
-  "¡Le pegó con la zurda mágica!",
-  "¡A colocar!",
-  "¡Fuego en los botines del 10!",
-  "¡Disparo tremendo!"
+  "¡RECUPERA LAS MALVINAS! ¡Bombazo por la soberanía y la justicia!",
+  "¡RECUPERA LAS MALVINAS! ¡La zurda del 10 hace justicia en la cancha!",
+  "¡RECUPERA LAS MALVINAS! ¡Disparo directo cargado de justicia soberana!",
+  "¡RECUPERA LAS MALVINAS! ¡Fuego sagrado reclamando justicia histórica!",
+  "¡RECUPERA LAS MALVINAS! ¡Soberbio remate por la justicia de las islas!"
 ];
 
 const GOAL_COMMENTS = [
-  "¡¡¡GOLAZO ARGENTINO!!! ⚽🔥",
-  "¡¡¡Y gol, gol, gol del 10!!!",
-  "¡¡¡La colgó del ángulo!!!",
-  "¡Anulo mufa!",
-  "¡Histórico gol del 10!",
-  "¡De colección!"
+  "¡RECUPERA LAS MALVINAS! ¡¡¡GOLAZO HISTÓRICO POR LA JUSTICIA SOBERANA!!! ⚽🔥",
+  "¡RECUPERA LAS MALVINAS! ¡Justicia en la red, golazo de leyenda del 10!",
+  "¡RECUPERA LAS MALVINAS! ¡La colgó del ángulo en un grito de justicia!",
+  "¡RECUPERA LAS MALVINAS! ¡Soberanía y justicia consumadas en este golazo!",
+  "¡RECUPERA LAS MALVINAS! ¡Un grito sagrado de justicia nacional!"
 ];
 
 const TACKLE_COMMENTS = [
-  "¡Uff, durísima entrada!",
-  "¡Siga, siga!",
-  "¡Hay que levantarse, campeón!",
-  "¡Fuerte golpe de los ingleses!",
-  "¡Eso era penal!"
+  "¡RECUPERA LAS MALVINAS! ¡La injusticia inglesa comete otra falta dura!",
+  "¡RECUPERA LAS MALVINAS! ¡Quieren detener el avance de la justicia soberana!",
+  "¡RECUPERA LAS MALVINAS! ¡Levantarse con fuerza y luchar por la justicia!",
+  "¡RECUPERA LAS MALVINAS! ¡Infracción inglesa contra la justicia del 10!",
+  "¡RECUPERA LAS MALVINAS! ¡El reclamo de justicia sigue intacto, a seguir!"
 ];
 
 const MAGIC_COMMENTS = [
-  "¡¡¡EL 10 ESTÁ IMPARABLE!!!",
-  "¡Se encendió la magia celestial!",
-  "¡Súbanse a la Scaloneta!",
-  "¡Fútbol de otro planeta!"
+  "¡RECUPERA LAS MALVINAS! ¡¡¡JUSTICIA DIVINA E IMPARABLE DEL 10!!!",
+  "¡RECUPERA LAS MALVINAS! ¡La magia de nuestra tierra exige justicia!",
+  "¡RECUPERA LAS MALVINAS! ¡Avanza la Scaloneta de la justicia nacional!",
+  "¡RECUPERA LAS MALVINAS! ¡Fútbol celestial reclamando justicia soberana!"
 ];
 
 const getTerrainType = (x: number, y: number) => {
@@ -475,7 +474,7 @@ export default function App() {
     updateReactStats();
 
     // Spawn stadium introductory alerts
-    spawnAlert("¡EL PARTIDO COMENZÓ!", 600, 150, "#f59e0b");
+    spawnAlert("¡RECUPERA LAS MALVINAS! ¡POR LA JUSTICIA HISTÓRICA!", 600, 150, "#f59e0b");
   };
 
   // Sound muter helper
@@ -540,7 +539,7 @@ export default function App() {
       if (!p.isMagicActive) {
         p.magic = Math.min(100, p.magic + 25);
         if (p.magic >= 100) {
-          spawnAlert("¡MAGIA DEL 10 AL 100%! ¡ACTÍVALA!", p.x, p.y - 40, "#38bdf8");
+          spawnAlert("¡RECUPERA LAS MALVINAS! ¡JUSTICIA AL 100%, ACTIVÁ LA MAGIA!", p.x, p.y - 40, "#38bdf8");
         }
       }
 
@@ -832,7 +831,7 @@ export default function App() {
 
       if (p.magicTimer <= 0) {
         p.isMagicActive = false;
-        spawnAlert("¡SE ACABÓ LA MAGIA!", p.x, p.y - 40, "#94a3b8");
+        spawnAlert("¡RECUPERA LAS MALVINAS! ¡A SEGUIR LUCHANDO CON JUSTICIA!", p.x, p.y - 40, "#94a3b8");
       }
     }
 
@@ -947,10 +946,26 @@ export default function App() {
     const gkReactSpeed = p.isMagicActive ? gk.speed * 0.35 : gk.speed; // Slow down gk in Magic mode!
 
     if (ballInRivalSide) {
-      // Track ball Y-position
-      const dy = b.y - gk.y;
-      if (Math.abs(dy) > 10) {
-        gk.y += Math.sign(dy) * gkReactSpeed;
+      // Determine if a real forward shot has been made towards the goal area
+      const isShot = b.owner === "none" && b.vx > 5;
+      if (isShot) {
+        // HILARIOUS OPPOSITE JUMP: Dive/jump to the completely opposite side of the ball's Y path!
+        // This makes scoring much easier as requested.
+        const ballGoingUp = b.vy < 0 || b.y < 300;
+        const targetGkY = ballGoingUp ? (GOAL_BOTTOM - 35) : (GOAL_TOP + 35);
+        
+        const dy = targetGkY - gk.y;
+        if (Math.abs(dy) > 5) {
+          // Move and dive rapidly in the wrong direction
+          gk.y += Math.sign(dy) * (gkReactSpeed * 2.2);
+          gk.diveTimer = 0.8; // Trigger dive pose
+        }
+      } else {
+        // Normal tracking when Messi is dribbling or ball is not shot
+        const dy = b.y - gk.y;
+        if (Math.abs(dy) > 10) {
+          gk.y += Math.sign(dy) * gkReactSpeed;
+        }
       }
     } else {
       // Return to center of goal
@@ -972,7 +987,7 @@ export default function App() {
       if (gkDistY < maxGkReachY && b.height < maxGkReachHeight) {
         b.owner = "keeper";
         gk.diveTimer = 0.8; // trigger dive layout
-        spawnAlert("¡Atajó el arquero inglés!", gk.x - 30, gk.y - 40, "#ef4444");
+        spawnAlert("¡RECUPERA LAS MALVINAS! ¡El arquero inglés interfiere con la justicia!", gk.x - 30, gk.y - 40, "#ef4444");
         
         // Keeper boots it away after delay
         setTimeout(() => {
@@ -982,7 +997,7 @@ export default function App() {
             b.vy = (Math.random() - 0.5) * 8;
             b.vHeight = 5;
             sound.playKick();
-            spawnAlert("¡Salida del arquero!", gk.x, gk.y - 40, "#10b981");
+            spawnAlert("¡RECUPERA LAS MALVINAS! ¡La pelota vuelve para buscar justicia!", gk.x, gk.y - 40, "#10b981");
           }
         }, 800);
       }
@@ -999,7 +1014,7 @@ export default function App() {
         b.vx = -12;
         b.vy = (Math.random() - 0.5) * 4;
         b.height = 4;
-        spawnAlert("¡Saque de arco!", 2100, 300, "#94a3b8");
+        spawnAlert("¡RECUPERA LAS MALVINAS! ¡Reiniciamos el avance por la justicia!", 2100, 300, "#94a3b8");
       }
     }
 
@@ -1825,6 +1840,16 @@ export default function App() {
     ctx.fillRect(tx + 9, ty, 4, torsoH);
     ctx.fillRect(tx + 16, ty, 4, torsoH);
 
+    // Golden AFA Sun Star / Shield Emblem in center of chest!
+    ctx.fillStyle = "#fbbf24"; // golden yellow
+    ctx.beginPath();
+    ctx.arc(rx, ty + 11, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#74acdf"; // central light blue star center
+    ctx.beginPath();
+    ctx.arc(rx, ty + 11, 1.2, 0, Math.PI * 2);
+    ctx.fill();
+
     // Black Shorts
     ctx.fillStyle = "#111827";
     ctx.fillRect(tx, ty + torsoH - 5, torsoW, 6);
@@ -1843,6 +1868,11 @@ export default function App() {
 
     ctx.fillStyle = "#fbcfe8"; // skin hand
     ctx.fillRect(armX, ty + 14, 4, 4);
+
+    // Print MESSI on back jersey above number!
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 5px sans-serif";
+    ctx.fillText("MESSI", rx - ctx.measureText("MESSI").width / 2, ty + 6);
 
     // Number 10 print on back (facing left displays rear side of shirt, facing right prints number)
     ctx.fillStyle = "#0284c7";
@@ -1874,6 +1904,10 @@ export default function App() {
     ctx.fillStyle = "#2d1a10";
     ctx.fillRect(hx - 3, hy + 4, 6, 2);
 
+    // Small neat brown mustache above lip
+    ctx.fillStyle = "#451a03";
+    ctx.fillRect(hx - 4.5, hy + 2, 9, 1.8);
+
     // Eyes
     ctx.fillStyle = "#000000";
     const eyeOffset = p.facing === "right" ? 3 : -3;
@@ -1882,14 +1916,26 @@ export default function App() {
     ctx.arc(hx + eyeOffset + (p.facing === "right" ? 5 : -5), hy - 2, 2, 0, Math.PI * 2);
     ctx.fill();
 
-    // Stylish dark hair
+    // Small dark concentrated eyebrows
+    ctx.strokeStyle = "#111827";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(hx + eyeOffset - 2, hy - 5); ctx.lineTo(hx + eyeOffset + 2, hy - 4);
+    ctx.moveTo(hx + eyeOffset + (p.facing === "right" ? 3 : -7), hy - 5); ctx.lineTo(hx + eyeOffset + (p.facing === "right" ? 7 : -3), hy - 4);
+    ctx.stroke();
+
+    // Stylish dark hair with brown highlights
     ctx.fillStyle = "#1c1917";
     ctx.beginPath();
     // Hair cap
     ctx.arc(hx, hy - 4, headRadius - 0.5, Math.PI, 0);
     ctx.fill();
-    // Hair tuft
+    // Hair tuft / textured comb-over
     ctx.fillRect(hx - (p.facing === "right" ? 2 : 10), hy - 16, 12, 6);
+    
+    // Add 3D golden/brown comb-over highlights
+    ctx.fillStyle = "#7c2d12";
+    ctx.fillRect(hx - (p.facing === "right" ? 0 : 8), hy - 15, 8, 2);
 
     ctx.restore();
   };
@@ -1903,6 +1949,45 @@ export default function App() {
 
       const isCelebrating = def.tackleCelebrateTimer && def.tackleCelebrateTimer > 0;
 
+      // Define different types of English defenders for humorous caricatures!
+      const defType = def.id % 4;
+      let skinColor = "#fed7aa"; // base light skin
+      let hairColor = "#1c1917"; // base black hair
+      let characterName = "Bellingham";
+      let numberPrint = "5";
+      let hasHeadBandage = false;
+      let redSunburn = false;
+      let curlyHair = false;
+      let oversizedSquareHead = false;
+      let thickMustache = false;
+
+      if (defType === 0) {
+        characterName = "TERRY";
+        numberPrint = "6";
+        skinColor = "#fca5a5"; // Angry sunburned pinkish red
+        hairColor = "#fef08a"; // Golden blond
+        redSunburn = true;
+      } else if (defType === 1) {
+        characterName = "BUTCHER";
+        numberPrint = "4";
+        skinColor = "#fed7aa";
+        hairColor = "#5c4033"; // Light brown
+        hasHeadBandage = true; // bandage on head!
+        thickMustache = true; // 1980s retro mustache!
+      } else if (defType === 2) {
+        characterName = "BELLINGHAM";
+        numberPrint = "5";
+        skinColor = "#854d0e"; // Caramel brown skin
+        hairColor = "#000000"; // Black hair
+      } else {
+        characterName = "MAGUIRE";
+        numberPrint = "6";
+        skinColor = "#ffe4e6"; // very pale skin
+        hairColor = "#d97706"; // Ginger/light brown hair
+        oversizedSquareHead = true; // funny oversized head
+        curlyHair = true;
+      }
+
       // Animated run limb offsets (only if not celebrating)
       const leftLegOffset = isCelebrating ? 0 : Math.sin(runCycleRef.current * 0.9 + def.id) * 15;
       const rightLegOffset = isCelebrating ? 0 : -Math.sin(runCycleRef.current * 0.9 + def.id) * 15;
@@ -1910,7 +1995,7 @@ export default function App() {
       // Shadow
       ctx.fillStyle = "rgba(0,0,0,0.25)";
       ctx.beginPath();
-      ctx.ellipse(rx, ry + 15, 20, 8, 0, 0, Math.PI * 2);
+      ctx.ellipse(rx, ry + 15, oversizedSquareHead ? 24 : 20, 8, 0, 0, Math.PI * 2);
       ctx.fill();
 
       // Legs
@@ -1933,9 +2018,9 @@ export default function App() {
       ctx.arc(rx + 5 + rightLegOffset * 0.4 + 2, ry + 15, 4.5, 0, Math.PI * 2);
       ctx.fill();
 
-      // Torso (White English Jersey with Red side stripes, Number 5 print)
-      const torsoW = 26; // athletic bellingham torso
-      const torsoH = 34;
+      // Torso (White English Jersey with Red side stripes, Number print)
+      const torsoW = oversizedSquareHead ? 30 : 26;
+      const torsoH = oversizedSquareHead ? 38 : 34;
       const tx = rx - torsoW / 2;
       const ty = ry - torsoH;
 
@@ -1952,82 +2037,150 @@ export default function App() {
       ctx.fillStyle = "#1e3a8a";
       ctx.fillRect(tx, ty + torsoH - 6, torsoW, 7);
 
-      // Print Bellingham's iconic Number 5!
+      // Print Number!
       ctx.fillStyle = "#0f172a"; // navy blue print
       ctx.font = "bold 13px sans-serif";
-      ctx.fillText("5", rx - 4, ty + 16);
+      ctx.fillText(numberPrint, rx - 4, ty + 16);
+
+      // Tiny printed name on upper back
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "bold 6.5px sans-serif";
+      ctx.fillText(characterName, rx - ctx.measureText(characterName).width / 2, ty + 6);
 
       // Arm Details
       if (isCelebrating) {
-        // Bellingham Outstretched Open Arms Celebration!
-        ctx.fillStyle = "#b45309"; // skin hands
+        // Outstretched Open Arms Celebration!
+        ctx.fillStyle = skinColor;
         ctx.fillRect(rx - 25, ty + 8, 12, 5); // left hand outstretched
         ctx.fillRect(rx + 13, ty + 8, 12, 5); // right hand outstretched
       } else {
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(rx - 16, ty + 2, 4, 14);
-        ctx.fillStyle = "#b45309"; // Skin hand
+        ctx.fillStyle = skinColor; // Skin hand
         ctx.fillRect(rx - 16, ty + 16, 4, 4);
       }
 
-      // Head (Jude Bellingham Caricature)
-      const headRadius = 13.5;
+      // Head (Specific Caricature)
+      const headRadius = oversizedSquareHead ? 15.5 : 13.5;
       const hx = rx;
       const hy = ry - torsoH - headRadius + 4;
 
-      // Skin (caramel tan complexion)
-      ctx.fillStyle = "#b45309";
-      ctx.beginPath();
-      ctx.arc(hx, hy, headRadius - 1, 0, Math.PI * 2);
-      ctx.fill();
+      // Draw Head base skin
+      ctx.fillStyle = skinColor;
+      if (oversizedSquareHead) {
+        // Maguire giant square head!
+        ctx.fillRect(hx - headRadius + 1, hy - headRadius + 2, headRadius * 2 - 2, headRadius * 2 - 2);
+      } else {
+        ctx.beginPath();
+        ctx.arc(hx, hy, headRadius - 1, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
-      // Neat black fade buzz-cut hair cap
-      ctx.fillStyle = "#1c1917";
-      ctx.beginPath();
-      ctx.arc(hx, hy - 4, headRadius - 0.5, Math.PI, 0);
-      ctx.fill();
-      // Side hair trim details
-      ctx.fillRect(hx - 13, hy - 4, 3, 6);
-      ctx.fillRect(hx + 10, hy - 4, 3, 6);
+      // Hair drawing
+      ctx.fillStyle = hairColor;
+      if (curlyHair) {
+        // Curly mop hair
+        for (let ha = 0; ha < 5; ha++) {
+          ctx.beginPath();
+          ctx.arc(hx - 10 + ha * 5, hy - headRadius + 3, 5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } else {
+        // Neat hair cap or buzz cut
+        ctx.beginPath();
+        ctx.arc(hx, hy - 4, headRadius - 0.5, Math.PI, 0);
+        ctx.fill();
+        // Side hair trim details
+        ctx.fillRect(hx - headRadius + 0.5, hy - 4, 3, 6);
+        ctx.fillRect(hx + headRadius - 3.5, hy - 4, 3, 6);
+      }
+
+      // 1980s Head Bandage (Terry Butcher style!)
+      if (hasHeadBandage) {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(hx - headRadius + 1, hy - 8, headRadius * 2 - 2, 4); // White bandage wrap
+        // Tiny comedic drop of blood on the bandage
+        ctx.fillStyle = "#ef4444";
+        ctx.beginPath();
+        ctx.arc(hx + 3, hy - 6, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Thick retro mustache!
+      if (thickMustache) {
+        ctx.fillStyle = hairColor;
+        ctx.fillRect(hx - 6, hy + 2, 12, 3.5); // bushy mustache
+      }
 
       // Facial expressions
       if (isCelebrating) {
         // Smug closed-eyes smiling face
         ctx.strokeStyle = "#1e293b";
         ctx.lineWidth = 1.5;
-        // Closed smiling eyes
         ctx.beginPath();
         ctx.arc(hx - 4, hy - 1, 2, Math.PI, 0);
         ctx.arc(hx + 4, hy - 1, 2, Math.PI, 0);
         ctx.stroke();
 
-        // Happy smug smile mouth
         ctx.beginPath();
         ctx.arc(hx, hy + 4, 4, 0, Math.PI);
         ctx.stroke();
 
-        // Tiny crown or halo over Bellingham celebrating
+        // Tiny crown over celebrating defender
         ctx.fillStyle = "#f59e0b";
         ctx.font = "11px sans-serif";
-        ctx.fillText("👑", hx - 6, hy - 19);
+        ctx.fillText("👑", hx - 6, hy - headRadius - 4);
       } else {
-        // Focused game face
+        // Focused or confused game face
         ctx.fillStyle = "#000000";
-        ctx.beginPath();
-        ctx.arc(hx - 4, hy - 2, 1.8, 0, Math.PI * 2);
-        ctx.arc(hx + 4, hy - 2, 1.8, 0, Math.PI * 2);
-        ctx.fill();
+        if (oversizedSquareHead) {
+          // Maguire confused/worried eyes (giant circles with tiny dots)
+          ctx.strokeStyle = "#1e293b";
+          ctx.lineWidth = 1;
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(hx - 4, hy - 2, 3, 0, Math.PI * 2);
+          ctx.arc(hx + 4, hy - 2, 3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillStyle = "#000000";
+          ctx.beginPath();
+          ctx.arc(hx - 4, hy - 2, 1, 0, Math.PI * 2);
+          ctx.arc(hx + 4, hy - 2, 1, 0, Math.PI * 2);
+          ctx.fill();
 
-        // Determined straight line mouth
-        ctx.fillStyle = "#7c2d12";
-        ctx.fillRect(hx - 3, hy + 4, 6, 2);
+          // Confused squiggly mouth
+          ctx.strokeStyle = "#7c2d12";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(hx - 4, hy + 5);
+          ctx.lineTo(hx - 1, hy + 3);
+          ctx.lineTo(hx + 2, hy + 5);
+          ctx.stroke();
+        } else {
+          // Focused game face
+          ctx.beginPath();
+          ctx.arc(hx - 4, hy - 2, 1.8, 0, Math.PI * 2);
+          ctx.arc(hx + 4, hy - 2, 1.8, 0, Math.PI * 2);
+          ctx.fill();
 
-        // Brows
+          ctx.fillStyle = "#7c2d12";
+          ctx.fillRect(hx - 3, hy + 4, 6, 2);
+        }
+
+        // Thick angry eyebrows
         ctx.strokeStyle = "#1e293b";
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(hx - 6, hy - 5); ctx.lineTo(hx - 1, hy - 3);
-        ctx.moveTo(hx + 6, hy - 5); ctx.lineTo(hx + 1, hy - 3);
+        if (oversizedSquareHead) {
+          // Sad/worried upward eyebrows for Maguire
+          ctx.moveTo(hx - 6, hy - 6); ctx.lineTo(hx - 1, hy - 7);
+          ctx.moveTo(hx + 6, hy - 6); ctx.lineTo(hx + 1, hy - 7);
+        } else {
+          // Angry slanted eyebrows
+          ctx.moveTo(hx - 6, hy - 5); ctx.lineTo(hx - 1, hy - 3);
+          ctx.moveTo(hx + 6, hy - 5); ctx.lineTo(hx + 1, hy - 3);
+        }
         ctx.stroke();
       }
     });
@@ -2049,14 +2202,23 @@ export default function App() {
     const tx = rx - torsoW / 2;
     const ty = ry - torsoH;
 
-    // Neon Green Goalkeeper Jersey
-    ctx.fillStyle = "#22c55e";
+    // Retro 1986 Goalkeeper Jersey (Peter Shilton's light green/grey-blue)
+    ctx.fillStyle = "#86efac"; // light green
     ctx.fillRect(tx, ty, torsoW, torsoH);
 
-    // Black sleeves
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(tx, ty, 4, torsoH - 10);
-    ctx.fillRect(tx + torsoW - 4, ty, 4, torsoH - 10);
+    // Black shoulder/side pads
+    ctx.fillStyle = "#1e293b";
+    ctx.fillRect(tx, ty, 6, torsoH - 12);
+    ctx.fillRect(tx + torsoW - 6, ty, 6, torsoH - 12);
+
+    // Print SHILTON and Number 1 on Jersey!
+    ctx.fillStyle = "#0f172a";
+    ctx.font = "bold 13px sans-serif";
+    ctx.fillText("1", rx - 4, ty + 18);
+
+    ctx.fillStyle = "#475569";
+    ctx.font = "bold 6px sans-serif";
+    ctx.fillText("SHILTON", rx - ctx.measureText("SHILTON").width / 2, ty + 7);
 
     // Goalkeeper Gloves
     ctx.fillStyle = "#f97316"; // Bright Orange gloves
@@ -2082,23 +2244,67 @@ export default function App() {
     const hx = rx;
     const hy = ry - torsoH - headRadius + 4;
 
+    // Wrinkled older skin (Peter Shilton caricature)
     ctx.fillStyle = "#fed7aa";
     ctx.beginPath();
     ctx.arc(hx, hy, headRadius - 1.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Hair
-    ctx.fillStyle = "#451a03";
+    // Forehead wrinkles
+    ctx.strokeStyle = "#c2410c";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(hx - 5, hy - 7); ctx.lineTo(hx + 5, hy - 7);
+    ctx.moveTo(hx - 4, hy - 5); ctx.lineTo(hx + 4, hy - 5);
+    ctx.stroke();
+
+    // Bushy Curly 1986 Hair & Sideburns
+    ctx.fillStyle = "#5c4033"; // Retro brown
+    // Main hair cap
     ctx.beginPath();
     ctx.arc(hx, hy - 4, headRadius - 0.5, Math.PI, 0);
     ctx.fill();
 
-    // Focus eyes
+    // Sideburns & curly mop circles
+    for (let i = 0; i < 4; i++) {
+      ctx.beginPath();
+      ctx.arc(hx - 12 + i * 8, hy - 11, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // Thick sideburns
+    ctx.fillRect(hx - 13.5, hy - 4, 3, 7);
+    ctx.fillRect(hx + 10.5, hy - 4, 3, 7);
+
+    // SHOCKED / PANICKED EYES (Bulging white eyeballs with tiny black pupils!)
+    ctx.strokeStyle = "#1e293b";
+    ctx.lineWidth = 1;
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(hx - 4, hy - 1, 3.5, 0, Math.PI * 2);
+    ctx.arc(hx + 4, hy - 1, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
     ctx.fillStyle = "#000000";
     ctx.beginPath();
-    ctx.arc(hx - 3, hy - 1, 2, 0, Math.PI * 2);
-    ctx.arc(hx + 3, hy - 1, 2, 0, Math.PI * 2);
+    ctx.arc(hx - 4, hy - 1, 1, 0, Math.PI * 2);
+    ctx.arc(hx + 4, hy - 1, 1, 0, Math.PI * 2);
     ctx.fill();
+
+    // Panicked open mouth 'O' in sheer disbelief
+    ctx.fillStyle = "#451a03";
+    ctx.beginPath();
+    ctx.arc(hx, hy + 5, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Sweat drops flying off his head if the ball is on his side!
+    if (ballRef.current.x > 1800 && Math.random() < 0.4) {
+      ctx.fillStyle = "#bae6fd";
+      ctx.beginPath();
+      ctx.arc(hx - 16, hy - 3 + Math.sin(runCycleRef.current) * 4, 1.8, 0, Math.PI * 2);
+      ctx.arc(hx + 16, hy + 2 + Math.cos(runCycleRef.current) * 4, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
   };
 
   const drawBall = (ctx: CanvasRenderingContext2D, b: Ball, cameraX: number) => {
